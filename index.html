@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-10">
+<meta name="app-build" content="2026.11.05-11">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1932,7 +1932,7 @@ function applyShared(d){S.sections=d.sections||[];S.videos=(d.videos||[]).map(v=
 function setCloud(state,msg){cloud.state=state;cloud.msg=msg;const d=$('#cloudDot');if(d){d.className='cloud '+state;$('#cloudTxt').textContent=state==='on'?'متصل':state==='err'?'خطأ بالاتصال':'محلي';d.title=msg}const cs=$('#cStat');if(cs){cs.className='status '+state;$('#cMsg').textContent=msg}}
 const loadScript=src=>new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.append(s)});
 function keepCur(L){if(!cur)return;const i=L.videos.findIndex(x=>x.id===cur.id);if(i<0)return;const n=L.videos[i];const pos=Math.max(n.pos||0,cur.pos||0);Object.assign(cur,n,{pos});L.videos[i]=cur}
-function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex','kind','list'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
+function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex','kind','list','imp'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
 function applyPub(d){const old=new Map(S.pub.videos.map(v=>[v.id,v]));S.pub.sections=d.sections||[];
   S.pub.videos=(d.videos||[]).map(v=>{const o=old.get(v.id)||{};const r={marks:[],pos:0,plays:0,fav:false,watched:false,last:0,...v};PF.forEach(k=>{if(o[k]!==undefined)r[k]=o[k]});r.dur=Math.max(v.dur||0,o.dur||0);return r});
   fixLib(S.pub);keepCur(S.pub)}
@@ -2037,9 +2037,23 @@ function mixUI(){
   const ix=$('#muIdx');if(ix&&MIX.n)ix.textContent=String(MIX.ix+1).padStart(2,'0')+' / '+String(MIX.n).padStart(2,'0');
   setCover();mixList();
 }
+/* songs that show up inside a mix are added to the same section, one time each */
+const TQ=[];let TQT=null;
+function titleQueue(v){TQ.push(v);if(TQT)return;TQT=setInterval(()=>{const x=TQ.shift();if(!x){clearInterval(TQT);TQT=null;return}fetchTitle(x)},350)}
+function mixImport(){
+  if(!cur||!cur.list||!yt||!yt.getPlaylist||!editable())return;let pl=[];try{pl=yt.getPlaylist()||[]}catch(e){}if(!pl.length)return;
+  const L=S.pub.videos.includes(cur)?S.pub:S.mine.videos.includes(cur)?S.mine:null;if(!L)return;
+  cur.imp=cur.imp||[];const done=new Set(cur.imp),have=new Set(L.videos.filter(x=>!x.list).map(x=>x.vid));
+  const add=pl.filter(id=>!done.has(id)&&!have.has(id));pl.forEach(id=>{if(!done.has(id))cur.imp.push(id)});
+  if(!add.length){if(cur.imp.length!==done.size)save();return}
+  const base=Date.now();
+  add.forEach((id,i)=>{const nv={id:uid(),kind:cur.kind||'video',list:'',vid:id,title:MIX.T[id]||'دا يجيب العنوان…',section:cur.section||'',note:'',start:0,fav:false,watched:false,plays:0,added:base-i,last:0,pos:0,dur:0,marks:[],from:cur.id};L.videos.push(nv);if(!MIX.T[id])titleQueue(nv)});
+  save();const sc=secOf(cur.section);toast(`انضافت ${add.length} ${cur.kind==='music'?'أغنية':'مقطع'} من الميكس${sc?' لقسم '+sc.name:cur.kind==='music'?' للموسيقى':''}`);
+}
 function mixList(){
   const box=$('#mixq');if(!box||!yt||!yt.getPlaylist)return;let pl=[],ix=0;try{pl=yt.getPlaylist()||[];ix=yt.getPlaylistIndex()}catch(e){}
   if(!pl.length){box.innerHTML='<div class="muted" style="padding:14px">دا يجيب أغاني الميكس…</div>';return}
+  mixImport();
   const from=Math.max(0,ix-1),L=pl.slice(from,from+30);
   box.innerHTML=L.map((id,k)=>{const i=from+k;return`<button class="qit ${i===ix?'now':''}" data-mixi="${i}"><span class="n">${i===ix?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(id,'mqdefault',false)}</span><span class="tx"><b data-mt="${id}">${esc(MIX.T[id]||'…')}</b><small class="num">${i===ix?'هسه':i<ix?'سابقاً':'التالي'}</small></span></button>`}).join('');
   L.slice(0,14).forEach(id=>mixTitle(id,t=>{box.querySelectorAll(`[data-mt="${id}"]`).forEach(e=>e.textContent=t)}));
@@ -2086,7 +2100,7 @@ setInterval(()=>{
   if(!PC.seeking&&d){const p=t/d;pcEl('pcSeek').value=Math.round(p*1000);pcEl('pcDone').style.width=(p*100)+'%'}
   const bf=pcEl('pcBuf');if(bf)bf.style.width=(b*100)+'%';
   if(cur&&cur.list){let vd=null;try{vd=yt.getVideoData&&yt.getVideoData()}catch(e){}
-    if(vd&&vd.video_id&&vd.video_id!==MIX.id&&!AD.on){MIX.id=vd.video_id;MIX.title=vd.title||MIX.T[vd.video_id]||'';try{MIX.n=(yt.getPlaylist()||[]).length;MIX.ix=yt.getPlaylistIndex()}catch(e){}if(MIX.title)MIX.T[MIX.id]=MIX.title;else mixTitle(MIX.id,tt=>{MIX.title=tt;mixUI()});mixUI()}}
+    if(vd&&vd.video_id&&vd.video_id!==MIX.id&&!AD.on){MIX.id=vd.video_id;MIX.title=vd.title||MIX.T[vd.video_id]||'';try{MIX.n=(yt.getPlaylist()||[]).length;MIX.ix=yt.getPlaylistIndex()}catch(e){}if(MIX.title)MIX.T[MIX.id]=MIX.title;else mixTitle(MIX.id,tt=>{MIX.title=tt;mixUI()});mixUI();mixImport()}}
   const pg=pcEl('pvProg');if(pg&&d)pg.style.width=(t/d*100)+'%';
   const rg=pcEl('muRing');if(rg&&d)rg.setAttribute('stroke-dasharray',(t/d*1000).toFixed(1)+' 1000');
   const md=pcEl('muDone');if(md&&d){if(!MU.seek){md.style.width=(t/d*100)+'%';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
