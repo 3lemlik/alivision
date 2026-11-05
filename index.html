@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-9">
+<meta name="app-build" content="2026.11.05-10">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1114,6 +1114,41 @@ body.is-playing #pv.full.mus .pc-cover .cvbg{animation-play-state:running}
 .psh p{margin:0;color:var(--dim);font-size:13.5px;line-height:1.7}
 .psh .who{display:flex;align-items:center;gap:10px;font-weight:700}
 .psh .who i{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+
+/* ===== v10 polish ===== */
+img[loading="lazy"]{opacity:0;transition:opacity .5s ease}
+img[loading="lazy"].ld{opacity:1}
+.sig{overflow:hidden}
+.sig::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.07) 50%,transparent 70%);background-size:220% 100%;animation:shim 1.6s linear infinite}
+@keyframes shim{from{background-position:120% 0}to{background-position:-120% 0}}
+.top{transition:box-shadow .3s,background .3s}
+body.scrolled .top{box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
+@media (max-width:900px){body.scrolled .top{background:color-mix(in srgb,var(--bg) 88%,transparent)!important}}
+.pv-prog{display:none;position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--grad);box-shadow:0 0 10px rgba(var(--acc-rgb),.9);z-index:4;transition:width .25s linear;border-radius:0 3px 3px 0}
+.pv.mini .pv-prog{display:block}
+.toast{background:var(--glass)!important;backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border:1px solid var(--glass-b)!important;box-shadow:0 14px 34px -14px rgba(0,0,0,.6);font-weight:600}
+.toast::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grad);box-shadow:0 0 10px rgba(var(--acc-rgb),.9);margin-inline-end:10px;vertical-align:middle}
+.mixt{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:6px 12px;border-radius:999px;background:rgba(var(--acc-rgb),.12);border:1px solid rgba(var(--acc-rgb),.35);font-size:13px;font-weight:700;cursor:pointer}
+.mixt input{accent-color:var(--accent);width:16px;height:16px}
+.mixnow{margin-top:6px;display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--dim)}
+.mixnow b{color:var(--fg);font-weight:700;unicode-bidi:plaintext}
+.mixnow i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);flex:none}
+body.is-playing .mixnow i{animation:corePulse 1.2s infinite}
+/* library header + list view */
+.lhead{background:linear-gradient(120deg,rgba(var(--acc-rgb),.16),transparent 55%),var(--glass)!important;border:1px solid var(--glass-b)!important;border-radius:24px!important;backdrop-filter:blur(14px)}
+.lhead h1{font-size:clamp(24px,3vw,32px)!important;font-weight:900!important}
+.grid.list .vc{border-radius:20px!important;transition:transform .2s,border-color .2s}
+.grid.list .vc:hover{border-color:color-mix(in srgb,var(--c) 60%,transparent)!important;transform:translateX(-3px)}
+/* watch title area */
+.wtitle{font-size:clamp(20px,2.4vw,28px)!important;line-height:1.35!important}
+.wmeta .tag{background:color-mix(in srgb,var(--accent) 14%,transparent)!important}
+/* empty state */
+.empty{border:1.5px dashed var(--line2)!important;border-radius:24px!important;background:var(--glass)!important}
+.empty .eo{background:var(--grad)!important;color:#fff!important;box-shadow:0 14px 30px -12px rgba(var(--acc-rgb),.9)}
+/* music list header + rows */
+.trk .cv{box-shadow:0 0 0 1px var(--glass-b),0 8px 18px -10px rgba(0,0,0,.6)}
+.trk.now .cv{box-shadow:0 0 0 2px var(--accent),0 0 18px rgba(var(--acc-rgb),.6)}
+@media (prefers-reduced-motion:reduce){.sig::after{animation:none}}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1147,7 +1182,7 @@ body.is-playing #pv.full.mus .pc-cover .cvbg{animation-play-state:running}
 <main class="wrap gut" id="app"></main>
 <div id="pv" class="pv" hidden>
   <div class="player pv-frame" id="player"><div id="ytp"></div><div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-cover" id="pcCover" aria-hidden="true"><div class="cvbg"></div><div class="disc"><span></span></div><div class="cveq"><i></i><i></i><i></i><i></i><i></i></div></div><div class="pc-fb" id="pcFb"></div><button class="pc-ad" id="pcAd" type="button"></button><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn" id="pcTouch" aria-label="لمس المقطع مباشرة (للإعلانات)" title="لمس مباشر (إذا طلع إعلان)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></button><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div></div>
-  <span class="pv-hint" aria-hidden="true"></span>
+  <span class="pv-hint" aria-hidden="true"></span><i class="pv-prog" id="pvProg"></i>
   <div class="pv-bar">
     <button class="pv-t" id="pvOpen" aria-label="افتح المقطع"><b id="pvTitle"></b><small id="pvSub"></small></button>
     <button class="pv-b" id="pvPlay" aria-label="تشغيل أو إيقاف"></button>
@@ -1256,19 +1291,23 @@ const editable=()=>S.src==='pub'?!!(typeof AUTH!=='undefined'&&AUTH.admin):true;
 
 /* ================= helpers ================= */
 function parseYT(raw){
-  const s=(raw||'').trim();if(!s)return null;let vid=null,start=0;
+  const s=(raw||'').trim();if(!s)return null;let vid=null,start=0,list='';
   const m=s.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*?&)?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);
-  if(m)vid=m[1];else if(/^[A-Za-z0-9_-]{11}$/.test(s))vid=s;if(!vid)return null;
+  if(m)vid=m[1];else if(/^[A-Za-z0-9_-]{11}$/.test(s))vid=s;
+  const l=/youtu/i.test(s)&&s.match(/[?&]list=([A-Za-z0-9_-]{10,})/);if(l)list=l[1];
+  if(!vid&&list){const r=list.match(/^RD(?:AMVM|EM|MM)?([A-Za-z0-9_-]{11})$/);if(r)vid=r[1]}
+  if(!vid&&!list)return null;
   const t=s.match(/[?&#](?:t|start)=([0-9hms]+)/);
   if(t){const v=t[1];if(/^\d+$/.test(v))start=+v;else{const h=v.match(/(\d+)h/),mi=v.match(/(\d+)m/),se=v.match(/(\d+)s/);start=(h?+h[1]*3600:0)+(mi?+mi[1]*60:0)+(se?+se[1]:0)}}
-  return{vid,start};
+  return{vid:vid||'',start,list};
 }
-const ytUrl=(v,t)=>`https://www.youtube.com/watch?v=${v.vid}${(t??v.start)?'&t='+Math.floor(t??v.start)+'s':''}`;
+const isMix=l=>/^RD/.test(l||'');
+const ytUrl=(v,t)=>v.vid?`https://www.youtube.com/watch?v=${v.vid}${v.list?'&list='+v.list:''}${(t??v.start)?'&t='+Math.floor(t??v.start)+'s':''}`:`https://www.youtube.com/playlist?list=${v.list}`;
 const fmtT=s=>{s=Math.floor(+s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
 const hue=str=>{let h=0;for(const c of str)h=(h*31+c.charCodeAt(0))%360;return h};
 function sig(vid,wave=true){const h=hue(vid);let p='';for(let i=0;i<=24;i++){p+=`${i*10},${(15+Math.sin(i*.9+h)*9*Math.sin(i*.3+h/40)).toFixed(1)} `}
   return`<div class="sig" style="background:linear-gradient(135deg,hsl(${h} 50% 18%),hsl(${(h+40)%360} 40% 8%) 70%)">${wave?`<svg class="wave" viewBox="0 0 240 30" preserveAspectRatio="none"><polyline points="${p}" fill="none" stroke="var(--accent)" stroke-width="2"/></svg><span class="id">${esc(vid)}</span>`:''}</div>`}
-const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="this.remove()" onload="if(this.naturalWidth<=120)this.remove()">`;
+const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="this.remove()" onload="if(this.naturalWidth<=120)this.remove();else this.classList.add('ld')">`;
 const secOf=id=>S.sections.find(s=>s.id===id);
 const isVid=v=>!v||v.kind!=='music';
 const isMusic=v=>!!v&&(v.kind==='music'||v.kind==='both');
@@ -1341,7 +1380,7 @@ function card(v){
   return`<article class="vc" data-id="${v.id}" style="--c:${sec?sec.color:'var(--accent)'}">
   <button class="vt" data-play="${v.id}" aria-label="تشغيل ${esc(v.title)}">${img(v.vid)}
    <span class="ov"><span class="playorb">${I.play}</span></span>
-   ${v.kind==='both'?`<span class="mus-b">${I.music}وبالموسيقى</span>`:''}${v.ex?'<span class="bdg ex">مثال</span>':''}${v.watched?`<span class="bdg wd">${I.check}شوهد</span>`:''}
+   ${v.list||v.kind==='both'?`<span class="mus-b">${v.list?I.shuffle+'ميكس':''}${v.list&&v.kind==='both'?' · ':''}${v.kind==='both'?(v.list?'':I.music)+'وبالموسيقى':''}</span>`:''}${v.ex?'<span class="bdg ex">مثال</span>':''}${v.watched?`<span class="bdg wd">${I.check}شوهد</span>`:''}
    ${v.dur?`<span class="bdg dur num">${fmtT(v.dur)}</span>`:''}
    ${p>0&&p<100?`<span class="bar"><i style="width:${p}%"></i></span>`:''}
   </button>
@@ -1443,14 +1482,16 @@ function spotArm(){clearTimeout(spotT);if(spotL.length>1&&S.settings.motion)spot
 document.addEventListener('click',e=>{const b=e.target.closest('[data-spot]');if(b)spotGo(+b.dataset.spot)});
 (()=>{let sx=null;document.addEventListener('touchstart',e=>{sx=e.target.closest('#spot')?e.touches[0].clientX:null},{passive:true});document.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)spotGo(spotI+(dx>0?1:-1))},{passive:true})})();
 function addVideo(p,sec,title='',note='',kind='video'){
-  const v={id:uid(),kind,vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
+  const lst=p.useList!==undefined?(p.useList?p.list:''):(isMix(p.list)||!p.vid?p.list:'');
+  const v={id:uid(),kind,list:lst||'',vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
   S.videos.push(v);save();rerender();toast(kind==='music'?'انضافت للموسيقى':kind==='both'?'انضاف للفيديو والموسيقى':'انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
   if(!title)fetchTitle(v);return v;
 }
 function fetchTitle(v){
-  const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title='مقطع '+v.vid;save();rerender()}};
+  const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title=v.list?'ميكس يوتيوب':'مقطع '+v.vid;save();rerender()}};
   if(!ONLINE){fallback();return}
-  fetch('https://noembed.com/embed?url='+encodeURIComponent('https://www.youtube.com/watch?v='+v.vid)).then(r=>r.json()).then(j=>{if(j.title){v.title=j.title;save();rerender()}else fallback()}).catch(fallback);
+  const u=v.vid?'https://www.youtube.com/watch?v='+v.vid:'https://www.youtube.com/playlist?list='+v.list;
+  fetch('https://noembed.com/embed?url='+encodeURIComponent(u)).then(r=>r.json()).then(j=>{if(j.title){if(!v.vid&&j.thumbnail_url){const m=j.thumbnail_url.match(/\/vi\/([A-Za-z0-9_-]{11})\//);if(m)v.vid=m[1]}v.title=(v.list&&v.vid&&isMix(v.list)?'ميكس · ':'')+j.title;save();rerender()}else fallback()}).catch(fallback);
 }
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-hf]');if(!b)return;homeF=b.dataset.hf;const y=scrollY;renderHome();scrollTo({top:Math.min(y,($('.ytchips')?.offsetTop||0)),behavior:'instant'})});
@@ -1498,7 +1539,7 @@ function setSleep(x){clearTimeout(MU.sT);MU.sleep=x;MU.sleepEnd=x==='end';
 function toggleKind(v){const o=['video','music','both'];v.kind=o[(o.indexOf(v.kind||'video')+1)%3];save();rerender();toast('صار يظهر بـ: '+KL[v.kind])}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tomus]');if(!b)return;closeMenu();const v=S.videos.find(x=>x.id===b.dataset.tomus);if(v&&editable())toggleKind(v)});
 function musicList(){return S.videos.filter(isMusic).sort((a,b)=>b.added-a.added)}
-function trk(v,i){const now=cur&&cur.id===v.id;return`<div class="trk ${now?'now':''}" role="button" tabindex="0" data-mplay="${v.id}"><span class="n">${now?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="cv">${img(v.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(v.title)}</b><small class="num">${v.plays} تشغيل${v.fav?' · بالمفضلة':''}</small></span><span class="d">${v.dur?fmtT(v.dur):''}</span><button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>`}
+function trk(v,i){const now=cur&&cur.id===v.id;return`<div class="trk ${now?'now':''}" role="button" tabindex="0" data-mplay="${v.id}"><span class="n">${now?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="cv">${img(v.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(v.title)}</b><small class="num">${v.list?'ميكس · ':''}${v.plays} تشغيل${v.fav?' · بالمفضلة':''}</small></span><span class="d">${v.dur?fmtT(v.dur):''}</span><button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>`}
 function renderMusic(){
   const L=musicList(),tot=L.reduce((a,v)=>a+(v.dur||0),0);
   $('#app').innerHTML=`<div class="view">
@@ -1523,18 +1564,18 @@ function renderMusicPlayer(id){
   const qi=Q.ids.indexOf(id),vol=S.settings.vol??100;
   $('#app').innerHTML=`<div class="view"><div class="deck">
    <div class="dk2" style="--cv:url('https://i.ytimg.com/vi/${v.vid}/hqdefault.jpg')"><div class="dkbg"></div>
-    <div class="hudl"><span><i></i>AV · AUDIO</span><span class="num">${String(qi+1).padStart(2,'0')} / ${String(Q.ids.length).padStart(2,'0')}</span></div>
+    <div class="hudl"><span><i></i>AV · AUDIO</span><span class="num" id="muIdx">${v.list?'MIX':String(qi+1).padStart(2,'0')+' / '+String(Q.ids.length).padStart(2,'0')}</span></div>
     <div class="orb"><svg class="oring" viewBox="0 0 200 200" aria-hidden="true"><circle class="ot" cx="100" cy="100" r="97"/><circle class="op" id="muRing" cx="100" cy="100" r="97" pathLength="1000" stroke-dasharray="0 1000"/><circle class="otk" cx="100" cy="100" r="89"/></svg><i class="o1"></i><i class="o2"></i><div class="pslot" id="pslot"></div></div>
-    <div class="mi2"><h1>${esc(v.title)}</h1><p>${esc(Q.name||'الموسيقى')}</p></div>
+    <div class="mi2"><h1 id="muTitle">${esc(v.list&&MIX.title&&same?MIX.title:v.title)}</h1><p>${v.list?'ميكس يوتيوب · '+esc(v.title.replace(/^ميكس · /,'')):esc(Q.name||'الموسيقى')}</p></div>
     <div class="adn">إعلان يشتغل هسه. دوس «تخطي» بزاوية الإطار، والأغنية تبدي وحدها.</div>
     <div class="mseek"><div class="tr"><i id="muDone" style="width:0"></i><input type="range" id="muSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="tm"><span id="muT1">0:00</span><span id="muT2">${v.dur?fmtT(v.dur):'0:00'}</span></div></div>
     <div class="mctl">
      <button class="tg ${MU.shuf?'on':''}" id="muShuf" aria-label="عشوائي">${I.shuffle}</button>
-     <button id="muPrev" aria-label="السابق" ${qi<=0?'disabled':''}>${I.next}</button>
+     <button id="muPrev" aria-label="السابق" ${qi<=0&&!v.list?'disabled':''}>${I.next}</button>
      <button class="sk" id="muBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/></svg><b>10</b></button>
      <button class="big" id="muPlay" aria-label="تشغيل أو إيقاف">${PC.st===2?I.play:IC_PAUSE}</button>
      <button class="sk" id="muFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/></svg><b>10</b></button>
-     <button id="muNext" aria-label="التالي" ${qi>=Q.ids.length-1?'disabled':''}>${I.prev}</button>
+     <button id="muNext" aria-label="التالي" ${qi>=Q.ids.length-1&&!v.list?'disabled':''}>${I.prev}</button>
      <button class="tg ${loopOn?'on':''}" id="muLoop" aria-label="تكرار">${I.loop}</button>
     </div>
     <div class="snd">
@@ -1549,15 +1590,16 @@ function renderMusicPlayer(id){
      </div>
     </div>
    </div>
-   <aside class="wside"><div class="hd"><div><b>التالي بالقائمة</b><small class="num">${qi+1} من ${Q.ids.length}</small></div></div>
+   <aside class="wside">${v.list?`<div class="hd"><div><b>داخل الميكس</b><small class="num" id="mixCount"></small></div></div><div class="qlist" id="mixq"><div class="muted" style="padding:14px">دا يجيب أغاني الميكس…</div></div></aside>`:`<div class="hd"><div><b>التالي بالقائمة</b><small class="num">${qi+1} من ${Q.ids.length}</small></div></div>
     <div class="qlist" id="qlist">${Q.ids.map((qid,i)=>{const q=S.videos.find(x=>x.id===qid);if(!q)return'';
-     return`<button class="qit ${i===qi?'now':''}" data-qplay="${qid}"><span class="n">${i===qi?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(q.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(q.title)}</b><small class="num">${q.dur?fmtT(q.dur)+' · ':''}${q.plays} تشغيل</small></span></button>`}).join('')}</div></aside>
+     return`<button class="qit ${i===qi?'now':''}" data-qplay="${qid}"><span class="n">${i===qi?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(q.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(q.title)}</b><small class="num">${q.dur?fmtT(q.dur)+' · ':''}${q.plays} تشغيل</small></span></button>`}).join('')}</div></aside>`}
   </div></div>`;
+  if(v.list&&same)setTimeout(mixUI,50);
   const cq=document.querySelector('.qit.now');if(cq)cq.scrollIntoView({block:'nearest'});
   $('#muPlay').onclick=muToggle;$('#muBack').onclick=()=>pcSeekBy(-10);$('#muFwd').onclick=()=>pcSeekBy(10);
   $('#muPrev').onclick=()=>step(-1);$('#muNext').onclick=()=>step(1);
   $('#muLoop').onclick=e=>{loopOn=!loopOn;e.currentTarget.classList.toggle('on',loopOn);toast(loopOn?'تكرار الأغنية':'بدون تكرار')};
-  $('#muShuf').onclick=()=>{MU.shuf=!MU.shuf;const rest=musicList().map(x=>x.id).filter(x=>x!==cur.id);Q={ids:[cur.id,...(MU.shuf?rest.sort(()=>Math.random()-.5):rest)],name:MU.shuf?'الموسيقى · عشوائي':'الموسيقى'};renderMusicPlayer(cur.id);toast(MU.shuf?'تشغيل عشوائي':'بالترتيب')};
+  $('#muShuf').onclick=()=>{if(cur.list){MU.shuf=!MU.shuf;try{yt.setShuffle(MU.shuf)}catch(e){}$('#muShuf').classList.toggle('on',MU.shuf);toast(MU.shuf?'الميكس صار عشوائي':'الميكس بالترتيب');setTimeout(mixList,500);return}MU.shuf=!MU.shuf;const rest=musicList().map(x=>x.id).filter(x=>x!==cur.id);Q={ids:[cur.id,...(MU.shuf?rest.sort(()=>Math.random()-.5):rest)],name:MU.shuf?'الموسيقى · عشوائي':'الموسيقى'};renderMusicPlayer(cur.id);toast(MU.shuf?'تشغيل عشوائي':'بالترتيب')};
   const sk=$('#muSeek');sk.oninput=()=>{MU.seek=true;$('#muDone').style.width=(sk.value/10)+'%';try{$('#muT1').textContent=fmtT(sk.value/1000*yt.getDuration())}catch(_){}};
   sk.onchange=()=>{try{yt.seekTo(sk.value/1000*yt.getDuration(),true)}catch(_){}MU.seek=false};
   const mv=$('#muVol');if(mv)mv.oninput=()=>{S.settings.vol=+mv.value;mv.style.setProperty('--p',mv.value+'%');$('#muVolT').textContent=mv.value;saveLocal();try{if(yt.isMuted())yt.unMute();yt.setVolume(curVol())}catch(e){}};
@@ -1592,7 +1634,7 @@ function pvState(st){const b=$('#pvPlay');if(b)b.innerHTML=st===1||st===3?IC_PAU
 function pvShow(mode){
   const pv=$('#pv');pv.hidden=false;PV.mode=mode;
   pv.classList.toggle('mini',mode==='mini');pv.classList.toggle('full',mode==='full');pv.classList.toggle('mus',PV.kind==='music');pv.classList.remove('snap','dragging');pv.style.opacity='';document.body.classList.toggle('pv-mini',mode==='mini');
-  if(mode==='mini'){pv.style.cssText='';$('#pvTitle').textContent=cur?cur.title:'';$('#pvSub').textContent=Q.name||(cur&&secOf(cur.section)?.name)||'';
+  if(mode==='mini'){pv.style.cssText='';$('#pvTitle').textContent=cur?((cur.list&&MIX.title)||cur.title):'';$('#pvSub').textContent=Q.name||(cur&&secOf(cur.section)?.name)||'';
     try{pvState(yt&&yt.getPlayerState?yt.getPlayerState():1)}catch(e){pvState(1)}}
   else pvSync();
   setCover();
@@ -1622,7 +1664,7 @@ function renderWatch(id){
    <div class="watch">
     <div class="wmain">
      <div class="stage"><div class="ambi">${img(v.vid,'mqdefault',false)}</div><div class="pslot" id="pslot"></div></div>
-     <div class="eyebrow" style="margin-top:20px"><span>NOW · PLAYING</span><b>ALI-VISION</b></div><h1 class="wtitle">${esc(v.title)}</h1>
+     <div class="eyebrow" style="margin-top:20px"><span>NOW · PLAYING</span><b>ALI-VISION</b></div><h1 class="wtitle">${esc(v.title)}</h1>${v.list?`<div class="mixnow" id="mixNow"><i></i>${same&&MIX.title?`يشتغل هسه: <b>${esc(MIX.title)}</b>`:'ميكس يوتيوب، يشتغل كامل وحده'}</div>`:''}
      <div class="wmeta">${sec?`<span class="tag"><i style="background:${sec.color}"></i>${esc(sec.name)}</span>`:''}<span class="num">${v.plays} تشغيل</span>${v.dur?`<span>·</span><span class="num">${fmtT(v.dur)}</span>`:''}<span>·</span><span>انضاف ${ago(v.added)}</span></div>
      <div class="wacts">
       <button class="btn sm ${v.fav?'on':''}" id="wFav">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'مفضلة'}</button>
@@ -1643,11 +1685,12 @@ function renderWatch(id){
       <div class="box"><h3>ملاحظاتي <span class="muted" id="nSaved"></span></h3><textarea id="wNote" placeholder="اكتب ملاحظاتك على المقطع… تنحفظ تلقائياً" ${editable()?'':'readonly'}>${esc(v.note)}</textarea></div>
      </div></details>
     </div>
-    <aside class="wside"><div class="hd"><div><b>${esc(Q.name||'قائمة التشغيل')}</b><small class="num">${qi+1} من ${Q.ids.length}</small></div>
-     <div style="display:flex;gap:6px"><button class="xb" id="wPrev" aria-label="السابق" ${qi<=0?'disabled':''}>${sv('prev',14)}</button><button class="xb" id="wNext" aria-label="التالي" ${qi>=Q.ids.length-1?'disabled':''}>${sv('next',14)}</button></div></div>
+    <aside class="wside">${v.list?`<div class="hd"><div><b>داخل الميكس</b><small class="num" id="mixCount"></small></div><div style="display:flex;gap:6px"><button class="xb" id="wPrev" aria-label="السابق">${sv('prev',14)}</button><button class="xb" id="wNext" aria-label="التالي">${sv('next',14)}</button></div></div><div class="qlist" id="mixq"><div class="muted" style="padding:14px">دا يجيب أغاني الميكس…</div></div></aside>`:`<div class="hd"><div><b>${esc(Q.name||'قائمة التشغيل')}</b><small class="num">${qi+1} من ${Q.ids.length}</small></div>
+     <div style="display:flex;gap:6px"><button class="xb" id="wPrev" aria-label="السابق" ${qi<=0&&!v.list?'disabled':''}>${sv('prev',14)}</button><button class="xb" id="wNext" aria-label="التالي" ${qi>=Q.ids.length-1&&!v.list?'disabled':''}>${sv('next',14)}</button></div></div>
      <div class="qlist" id="qlist">${Q.ids.map((qid,i)=>{const q=S.videos.find(x=>x.id===qid);if(!q)return'';const p=pct(q);
-      return`<button class="qit ${i===qi?'now':''}" data-qplay="${qid}"><span class="n">${i===qi?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(q.vid,'mqdefault',false)}${p>0?`<span class="bar"><i style="width:${p}%"></i></span>`:''}</span><span class="tx"><b>${esc(q.title)}</b><small class="num">${q.dur?fmtT(q.dur)+' · ':''}${q.watched?'شوهد':q.plays+' تشغيل'}</small></span></button>`}).join('')}</div></aside>
+      return`<button class="qit ${i===qi?'now':''}" data-qplay="${qid}"><span class="n">${i===qi?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(q.vid,'mqdefault',false)}${p>0?`<span class="bar"><i style="width:${p}%"></i></span>`:''}</span><span class="tx"><b>${esc(q.title)}</b><small class="num">${q.dur?fmtT(q.dur)+' · ':''}${q.watched?'شوهد':q.plays+' تشغيل'}</small></span></button>`}).join('')}</div></aside>`}
    </div></div>`;
+  if(v.list&&same)setTimeout(mixUI,50);
   renderMarks();
   const cq=document.querySelector('.qit.now');if(cq)cq.scrollIntoView({block:'nearest'});
   $('#bBack').onclick=()=>history.length>1?history.back():go('home');
@@ -1673,25 +1716,27 @@ function renderMarks(){
   const v=cur,el=$('#marks');if(!el)return;
   el.innerHTML=v.marks.length?v.marks.map((m,i)=>`<div class="bm" role="button" tabindex="0" data-seek="${m.t}"><span class="t num">${fmtT(m.t)}</span><span class="l" ${editable()?`contenteditable="true" data-mi="${i}"`:''}>${esc(m.l)}</span>${editable()?`<button class="x" data-mdel="${i}" aria-label="حذف العلامة">${sv('x',14)}</button>`:''}</div>`).join(''):'<div class="muted">علّم اللحظات المهمة بالمقطع حتى ترجعلها بضغطة.</div>';
 }
-function step(d){const i=Q.ids.indexOf(cur.id)+d;if(i>=0&&i<Q.ids.length)goV(Q.ids[i])}
+function step(d){if(cur&&cur.list&&yt&&yt.nextVideo){try{d>0?yt.nextVideo():yt.previousVideo()}catch(e){}return}const i=Q.ids.indexOf(cur.id)+d;if(i>=0&&i<Q.ids.length)goV(Q.ids[i])}
 function ensureYtp(){const box=$('#player');if(!$('#ytp')){box.innerHTML='<div id="ytp"></div>'+PCTL;yt=null}else if(!$('#pctl'))box.insertAdjacentHTML('beforeend',PCTL);return box}
 function mountPlayer(v){
   const box=$('#player');PV.id=v.id;AD.mt=Date.now();AD.lastAdv=Date.now();if(AD.on)setAd(false);clearInterval(cdT);clearInterval(ytTimer);box.querySelectorAll('.nextup').forEach(e=>e.remove());
   const fallbackMsg=()=>{try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>افتح الموقع من رابط GitHub Pages حتى تشتغل المقاطع.</p></div>`};
   if(!ONLINE){fallbackMsg();return}
   ensureYtp();setCover();
-  const resume=(!v.watched&&v.pos>5&&(!v.dur||v.pos<v.dur-10))?Math.floor(v.pos):(v.start||0);
-  if(yt&&yt.loadVideoById){try{yt.loadVideoById({videoId:v.vid,startSeconds:resume});applyAudio()}catch(e){}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));return}
+  const resume=v.list?(v.start||0):(!v.watched&&v.pos>5&&(!v.dur||v.pos<v.dur-10))?Math.floor(v.pos):(v.start||0);MIX.id=null;MIX.n=0;
+  if(yt&&yt.loadVideoById){try{if(v.list)yt.loadPlaylist({list:v.list,listType:'playlist',index:0,startSeconds:resume});else yt.loadVideoById({videoId:v.vid,startSeconds:resume});applyAudio()}catch(e){}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));return}
   loadYTApi().then(()=>{
     if(cur!==v)return;ensureYtp();
-    yt=new YT.Player('ytp',{videoId:v.vid,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,iv_load_policy:3,cc_load_policy:0,rel:0,modestbranding:1,playsinline:1,start:resume,origin:location.origin},
+    yt=new YT.Player('ytp',{...(v.vid?{videoId:v.vid}:{}),host:'https://www.youtube-nocookie.com',playerVars:{...(v.list?{list:v.list,listType:'playlist'}:{}),autoplay:1,controls:0,disablekb:1,fs:0,iv_load_policy:3,cc_load_policy:0,rel:0,modestbranding:1,playsinline:1,start:resume,origin:location.origin},
       events:{
         onReady:e=>{const v=cur;pcSpeedLbl();pcMuteLbl();pcFsLbl();try{e.target.setPlaybackRate(curRate());e.target.setVolume(curVol())}catch(_){}const d=e.target.getDuration();if(v&&d&&!v.dur){v.dur=Math.round(d);saveLocal()}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));e.target.playVideo()},
         onStateChange:e=>{
           const v=cur;pvState(e.data);pcState(e.data);if(!v)return;
-          if(e.data===1){clearInterval(ytTimer);ytTimer=setInterval(()=>{try{v.pos=yt.getCurrentTime();if(!v.dur)v.dur=Math.round(yt.getDuration());if(v.dur&&v.pos/v.dur>.93&&!v.watched){v.watched=true;save()}else saveLocal()}catch(_){}},4000)}
+          if(e.data===1){clearInterval(ytTimer);ytTimer=setInterval(()=>{if(v.list)return;try{v.pos=yt.getCurrentTime();if(!v.dur)v.dur=Math.round(yt.getDuration());if(v.dur&&v.pos/v.dur>.93&&!v.watched){v.watched=true;save()}else saveLocal()}catch(_){}},4000)}
           else if(e.data===2){clearInterval(ytTimer);try{v.pos=yt.getCurrentTime()}catch(_){}save()}
-          else if(e.data===0){clearInterval(ytTimer);v.watched=true;v.pos=0;save();
+          else if(e.data===0){clearInterval(ytTimer);
+            if(v.list){if(MU.sleepEnd){setSleep(0);try{yt.stopVideo()}catch(_){}toast('مؤقت النوم: وگفت بنهاية الأغنية');return}try{const pl=yt.getPlaylist()||[];if(pl.length&&yt.getPlaylistIndex()<pl.length-1)return}catch(_){}}
+            v.watched=true;v.pos=0;save();
             if(MU.sleepEnd){setSleep(0);pcEnded(v);toast('مؤقت النوم: وگفت بنهاية الأغنية');return}
             if(loopOn){yt.seekTo(0);yt.playVideo();return}
             pcEnded(v);
@@ -1740,8 +1785,8 @@ function openEditor(id,pre='',secPre,kindPre){
   const check=()=>{parsed=parseYT(fu.value);
     if(!fu.value.trim()){det.innerHTML='<span class="muted">بانتظار الرابط…</span>';return}
     if(!parsed){det.innerHTML='<span class="bad">الرابط غير معروف. من يوتيوب: مشاركة ← نسخ الرابط.</span>';return}
-    const dup=S.videos.find(x=>x.vid===parsed.vid&&x.id!==id);
-    det.innerHTML=`<div class="pv">${img(parsed.vid,'mqdefault',false)}</div><div><div class="ok" style="font-weight:600">لگيت المقطع</div>${parsed.start?`<div class="muted">يبدأ من ${fmtT(parsed.start)}</div>`:''}${dup?`<div style="color:var(--warn)">موجود مسبقاً: ${esc(dup.title)}</div>`:''}</div>`};
+    const dup=S.videos.find(x=>x.vid===parsed.vid&&(x.list||'')===(parsed.list||'')&&x.id!==id);
+    det.innerHTML=`<div class="pv">${parsed.vid?img(parsed.vid,'mqdefault',false):''}</div><div><div class="ok" style="font-weight:600">${parsed.list?(isMix(parsed.list)?'لگيت ميكس يوتيوب':'لگيت قائمة تشغيل'):'لگيت المقطع'}</div>${parsed.list?`<label class="mixt"><input type="checkbox" id="fMix" ${isMix(parsed.list)||!parsed.vid?'checked':''} ${!parsed.vid?'disabled':''}><span>شغّل ${isMix(parsed.list)?'الميكس كامل':'القائمة كاملة'}</span></label>`:''}${parsed.start?`<div class="muted">يبدأ من ${fmtT(parsed.start)}</div>`:''}${dup?`<div style="color:var(--warn)">موجود مسبقاً: ${esc(dup.title)}</div>`:''}</div>`};
   fu.oninput=check;check();
   $('#fSec').onchange=e=>{$('#nsF').hidden=e.target.value!=='__new';if(e.target.value==='__new')$('#fNS').focus()};
   document.querySelectorAll('#layer [data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('#layer [data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#mOne').style.display=mode==='one'?'flex':'none';$('#mBulk').hidden=mode!=='bulk'});
@@ -1752,11 +1797,12 @@ function openEditor(id,pre='',secPre,kindPre){
     if(ty==='mus')sec='';
     else if(sec==='__new'){const n=$('#fNS').value.trim();if(!n){toast('اكتب اسم القسم');return}const s={id:uid(),name:n,color:S.settings.accent};S.sections.push(s);sec=s.id}
     if(mode==='bulk'){const items=$('#fBulk').value.split(/\s+/).map(parseYT).filter(Boolean);if(!items.length){toast('ما لگيت روابط صحيحة');return}
-      closeLayer(true);items.forEach(p=>{const nv={id:uid(),kind,vid:p.vid,title:'دا يجيب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`انضاف ${items.length} مقطع`);return}
+      closeLayer(true);items.forEach(p=>{const nv={id:uid(),kind,list:isMix(p.list)||!p.vid?p.list:'',vid:p.vid,title:'دا يجيب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`انضاف ${items.length} مقطع`);return}
     if(!parsed){toast('الرابط غير صحيح');fu.focus();return}
     const title=$('#fTitle').value.trim(),note=$('#fNote').value.trim();
     closeLayer(true);
-    if(v){const vidChanged=v.vid!==parsed.vid;Object.assign(v,{vid:parsed.vid,start:parsed.start,title:title||v.title,note,section:sec,kind,ex:false});save();toast('تم الحفظ');if(isPR(location.hash.slice(1))&&location.hash.slice(3)===v.id){if(vidChanged){stopPlayer();renderWatch(v.id)}else{const t=$('.wtitle');if(t)t.textContent=v.title;const n=$('#wNote');if(n)n.value=v.note}}else rerender()}
+    const fm=$('#fMix');parsed.useList=!!(parsed.list&&(fm?fm.checked:true));
+    if(v){const vidChanged=v.vid!==parsed.vid||(v.list||'')!==(parsed.useList?parsed.list:'');Object.assign(v,{vid:parsed.vid,list:parsed.useList?parsed.list:'',start:parsed.start,title:title||v.title,note,section:sec,kind,ex:false});save();toast('تم الحفظ');if(isPR(location.hash.slice(1))&&location.hash.slice(3)===v.id){if(vidChanged){stopPlayer();renderWatch(v.id)}else{const t=$('.wtitle');if(t)t.textContent=v.title;const n=$('#wNote');if(n)n.value=v.note}}else rerender()}
     else addVideo(parsed,sec,title,note,kind);
   };
   $('#layer').querySelectorAll('input.in').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#fSave').click()}}));
@@ -1886,7 +1932,7 @@ function applyShared(d){S.sections=d.sections||[];S.videos=(d.videos||[]).map(v=
 function setCloud(state,msg){cloud.state=state;cloud.msg=msg;const d=$('#cloudDot');if(d){d.className='cloud '+state;$('#cloudTxt').textContent=state==='on'?'متصل':state==='err'?'خطأ بالاتصال':'محلي';d.title=msg}const cs=$('#cStat');if(cs){cs.className='status '+state;$('#cMsg').textContent=msg}}
 const loadScript=src=>new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.append(s)});
 function keepCur(L){if(!cur)return;const i=L.videos.findIndex(x=>x.id===cur.id);if(i<0)return;const n=L.videos[i];const pos=Math.max(n.pos||0,cur.pos||0);Object.assign(cur,n,{pos});L.videos[i]=cur}
-function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex','kind'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
+function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex','kind','list'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
 function applyPub(d){const old=new Map(S.pub.videos.map(v=>[v.id,v]));S.pub.sections=d.sections||[];
   S.pub.videos=(d.videos||[]).map(v=>{const o=old.get(v.id)||{};const r={marks:[],pos:0,plays:0,fav:false,watched:false,last:0,...v};PF.forEach(k=>{if(o[k]!==undefined)r[k]=o[k]});r.dur=Math.max(v.dur||0,o.dur||0);return r});
   fixLib(S.pub);keepCur(S.pub)}
@@ -1979,7 +2025,28 @@ const PC={hideT:null,seeking:false,st:-1,lastTap:0};
 /* ads: YouTube ads can't be controlled through the API, so when one plays we get out of the way
    (show YouTube's own layer and let taps through) so the "Skip" button works */
 const AD={on:false,manual:false,lastT:-1,lastAdv:0,mt:0,mT:null};
-function setCover(){const c=document.getElementById('pcCover');if(c&&cur)c.style.setProperty('--cv',`url("https://i.ytimg.com/vi/${cur.vid}/hqdefault.jpg")`)}
+function setCover(){const c=document.getElementById('pcCover');const id=cur&&((cur.list&&MIX.id)||cur.vid);if(c&&id)c.style.setProperty('--cv',`url("https://i.ytimg.com/vi/${id}/hqdefault.jpg")`)}
+/* ---- mixes: follow the track YouTube is playing ---- */
+const MIX={id:null,title:'',n:0,ix:0,T:{}};
+function mixTitle(id,cb){if(MIX.T[id]){cb(MIX.T[id]);return}if(!ONLINE)return;fetch('https://noembed.com/embed?url='+encodeURIComponent('https://www.youtube.com/watch?v='+id)).then(r=>r.json()).then(j=>{if(j.title){MIX.T[id]=j.title;cb(j.title)}}).catch(()=>{})}
+function mixUI(){
+  if(!cur||!cur.list)return;const t=MIX.title||cur.title;
+  const h=$('#muTitle');if(h)h.textContent=t;const w=$('#mixNow');if(w)w.innerHTML=`<i></i>يشتغل هسه: <b>${esc(t)}</b>`;
+  const pt=$('#pvTitle');if(pt)pt.textContent=t;
+  const dk=$('.dk2');if(dk&&MIX.id)dk.style.setProperty('--cv',`url('https://i.ytimg.com/vi/${MIX.id}/hqdefault.jpg')`);
+  const ix=$('#muIdx');if(ix&&MIX.n)ix.textContent=String(MIX.ix+1).padStart(2,'0')+' / '+String(MIX.n).padStart(2,'0');
+  setCover();mixList();
+}
+function mixList(){
+  const box=$('#mixq');if(!box||!yt||!yt.getPlaylist)return;let pl=[],ix=0;try{pl=yt.getPlaylist()||[];ix=yt.getPlaylistIndex()}catch(e){}
+  if(!pl.length){box.innerHTML='<div class="muted" style="padding:14px">دا يجيب أغاني الميكس…</div>';return}
+  const from=Math.max(0,ix-1),L=pl.slice(from,from+30);
+  box.innerHTML=L.map((id,k)=>{const i=from+k;return`<button class="qit ${i===ix?'now':''}" data-mixi="${i}"><span class="n">${i===ix?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="th">${img(id,'mqdefault',false)}</span><span class="tx"><b data-mt="${id}">${esc(MIX.T[id]||'…')}</b><small class="num">${i===ix?'هسه':i<ix?'سابقاً':'التالي'}</small></span></button>`}).join('');
+  L.slice(0,14).forEach(id=>mixTitle(id,t=>{box.querySelectorAll(`[data-mt="${id}"]`).forEach(e=>e.textContent=t)}));
+  const now=box.querySelector('.now');if(now)now.scrollIntoView({block:'nearest'});
+  const hd=$('#mixCount');if(hd)hd.textContent=(ix+1)+' من '+pl.length;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mixi]');if(!b)return;try{yt.playVideoAt(+b.dataset.mixi)}catch(_){}});
 function setAd(on,manual){
   AD.on=on;AD.manual=!!(on&&manual);clearTimeout(AD.mT);
   const pv=document.getElementById('pv');if(pv)pv.classList.toggle('ad',on);document.body.classList.toggle('ad-on',on&&!AD.manual);
@@ -2014,10 +2081,13 @@ setInterval(()=>{
    const frozen=st===1&&now-AD.lastAdv>1600, stuck=(st===-1||st===5)&&AD.mt&&now-AD.mt>6000&&now-AD.lastAdv>6000;
    if(!AD.on&&(frozen||stuck))setAd(true);
    else if(AD.on&&!AD.manual&&st===1&&now-AD.lastAdv<400)setAd(false);
-   if(!AD.on&&st===1&&cur&&d>1&&now-AD.lastAdv<400&&Math.abs((cur.dur||0)-d)>2)cur.dur=Math.round(d)}
+   if(!AD.on&&st===1&&cur&&!cur.list&&d>1&&now-AD.lastAdv<400&&Math.abs((cur.dur||0)-d)>2)cur.dur=Math.round(d)}
   const tm=pcEl('pcTime');if(tm)tm.textContent=fmtT(t)+' / '+fmtT(d);
   if(!PC.seeking&&d){const p=t/d;pcEl('pcSeek').value=Math.round(p*1000);pcEl('pcDone').style.width=(p*100)+'%'}
   const bf=pcEl('pcBuf');if(bf)bf.style.width=(b*100)+'%';
+  if(cur&&cur.list){let vd=null;try{vd=yt.getVideoData&&yt.getVideoData()}catch(e){}
+    if(vd&&vd.video_id&&vd.video_id!==MIX.id&&!AD.on){MIX.id=vd.video_id;MIX.title=vd.title||MIX.T[vd.video_id]||'';try{MIX.n=(yt.getPlaylist()||[]).length;MIX.ix=yt.getPlaylistIndex()}catch(e){}if(MIX.title)MIX.T[MIX.id]=MIX.title;else mixTitle(MIX.id,tt=>{MIX.title=tt;mixUI()});mixUI()}}
+  const pg=pcEl('pvProg');if(pg&&d)pg.style.width=(t/d*100)+'%';
   const rg=pcEl('muRing');if(rg&&d)rg.setAttribute('stroke-dasharray',(t/d*1000).toFixed(1)+' 1000');
   const md=pcEl('muDone');if(md&&d){if(!MU.seek){md.style.width=(t/d*100)+'%';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
 },250);
@@ -2183,6 +2253,7 @@ function boot(){const B=$('#boot');if(!S.settings.intro||RM||!S.settings.motion)
 apply();onRoute();boot();
 cloudInit();
 syncSrcUI();document.querySelectorAll('#nav .ix').forEach((e,i)=>e.textContent=String(i+1).padStart(2,'0'));
+addEventListener('scroll',()=>document.body.classList.toggle('scrolled',scrollY>8),{passive:true});
 window.__av={playing:()=>{try{return!!yt&&yt.getPlayerState()===1}catch(e){return false}},toast};
 })();
 </script>
