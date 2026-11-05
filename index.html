@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-17">
+<meta name="app-build" content="2026.11.05-18">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1283,6 +1283,25 @@ html.lite .dock{background:var(--bg)!important}
 .msearch .num{font-size:12px;color:var(--dim);white-space:nowrap}
 .trk[hidden]{display:none!important}
 .msearch input:focus-visible{outline:none!important}
+
+/* ===== v18: cool phone — nothing animates unless it means something ===== */
+@keyframes eqb{0%{transform:scaleY(.15)}50%{transform:scaleY(.9)}100%{transform:scaleY(.4)}}
+.eq i,.pc-cover .cveq i,.mhead .bars i,.viz i{height:100%!important;transform-origin:50% 100%;animation-name:eqb!important}
+@keyframes sprog2{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.spot .sprog i{width:100%!important;transform-origin:100% 50%;animation:sprog2 6.5s linear forwards!important}
+.spot.off .sprog i,html[data-hidden] .spot .sprog i{animation-play-state:paused!important}
+#pcDone,#pcBuf,#muDone,#pvProg{width:100%!important;right:auto;transform-origin:0 50%;transform:scaleX(0);transition:transform .25s linear}
+#muDone{right:0!important}
+.pc-load{animation-play-state:paused!important}
+.pctl[data-st="buf"] .pc-load{animation-play-state:running!important}
+.spot .tag i,.pill .live{animation:none!important}
+.mhead .bars i{animation-duration:2.2s!important}
+@media (hover:none),(max-width:900px){
+  .mhead .bars{display:none}
+  .orb .o1{animation:none!important}
+  #pv.full.mus .pc-cover .cvbg{animation-duration:60s!important}
+  body.is-playing .hudl span:first-child i,body.is-playing .mixnow i{animation:none!important}
+}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1645,8 +1664,8 @@ function spotGo(i){const sp=document.getElementById('spot');if(!sp||!spotL.lengt
     if(Math.abs(k-spotI)<=1){const im=x.querySelector('img[loading="lazy"]');if(im)im.loading='eager'}});
   sp.querySelectorAll('[data-spot]').forEach((b,k)=>b.classList.toggle('on',k===spotI));
   const p=document.getElementById('sprog');if(p)p.innerHTML='<i></i>'}
-function spotArm(){}
-document.addEventListener('animationend',e=>{if(e.animationName==='sprog'&&e.target.closest&&e.target.closest('#sprog'))spotGo(spotI+1)});
+let SPIO=null;function spotArm(){try{SPIO&&SPIO.disconnect()}catch(e){}const sp=document.getElementById('spot');if(!sp||!window.IntersectionObserver)return;SPIO=new IntersectionObserver(es=>sp.classList.toggle('off',!es[0].isIntersecting));SPIO.observe(sp)}
+document.addEventListener('animationend',e=>{if((e.animationName==='sprog'||e.animationName==='sprog2')&&e.target.closest&&e.target.closest('#sprog'))spotGo(spotI+1)});
 document.addEventListener('click',e=>{if(Date.now()-SPOTDRAG<400&&e.target.closest('#spot')){e.stopPropagation();e.preventDefault();return}const b=e.target.closest('[data-spot]');if(b)spotGo(+b.dataset.spot)},true);
 /* finger / mouse drag that follows you, with momentum and a soft edge */
 (()=>{let d=null;
@@ -1785,7 +1804,7 @@ function renderMusicPlayer(id){
   $('#muPrev').onclick=()=>step(-1);$('#muNext').onclick=()=>step(1);
   $('#muLoop').onclick=e=>{loopOn=!loopOn;e.currentTarget.classList.toggle('on',loopOn);toast(loopOn?'تكرار الأغنية':'بدون تكرار')};
   $('#muShuf').onclick=()=>{if(cur.list){MU.shuf=!MU.shuf;try{yt.setShuffle(MU.shuf)}catch(e){}$('#muShuf').classList.toggle('on',MU.shuf);toast(MU.shuf?'الميكس صار عشوائي':'الميكس بالترتيب');setTimeout(mixList,500);return}MU.shuf=!MU.shuf;const rest=musicList().map(x=>x.id).filter(x=>x!==cur.id);Q={ids:[cur.id,...(MU.shuf?rest.sort(()=>Math.random()-.5):rest)],name:MU.shuf?'الموسيقى · عشوائي':'الموسيقى'};renderMusicPlayer(cur.id);toast(MU.shuf?'تشغيل عشوائي':'بالترتيب')};
-  const sk=$('#muSeek');sk.oninput=()=>{MU.seek=true;$('#muDone').style.width=(sk.value/10)+'%';try{$('#muT1').textContent=fmtT(sk.value/1000*yt.getDuration())}catch(_){}};
+  const sk=$('#muSeek');sk.oninput=()=>{MU.seek=true;$('#muDone').style.transform='scaleX('+(sk.value/1000)+')';try{$('#muT1').textContent=fmtT(sk.value/1000*yt.getDuration())}catch(_){}};
   sk.onchange=()=>{try{yt.seekTo(sk.value/1000*yt.getDuration(),true)}catch(_){}MU.seek=false};
   const mv=$('#muVol');if(mv)mv.oninput=()=>{S.settings.vol=+mv.value;mv.style.setProperty('--p',mv.value+'%');$('#muVolT').textContent=mv.value;saveLocal();try{if(yt.isMuted())yt.unMute();yt.setVolume(curVol())}catch(e){}};
   $('#muMute').onclick=()=>{try{yt.isMuted()?yt.unMute():yt.mute();setTimeout(()=>{const m=yt.isMuted();$('#muMute').style.color=m?'var(--accent)':'';toast(m?'انكتم الصوت':'رجع الصوت')},60)}catch(e){}};
@@ -2275,6 +2294,7 @@ function pcFull(){
 document.addEventListener('fullscreenchange',()=>{pcFsLbl();pvFollow(300)});
 setInterval(()=>{
   if(!yt||!yt.getCurrentTime||document.hidden)return;const c=pcEl('pctl');if(!c)return;
+  {let s0=-1;try{s0=yt.getPlayerState()}catch(e){}const idle=s0===2||s0===0;if(idle&&PC.idleDone&&!PC.seeking&&!AD.manual)return;PC.idleDone=idle}
   let t=0,d=0,b=0;try{t=yt.getCurrentTime()||0;d=yt.getDuration()||0;b=yt.getVideoLoadedFraction?yt.getVideoLoadedFraction():0}catch(e){return}
   {const now=Date.now();let st=-1;try{st=yt.getPlayerState()}catch(e){}
    if(Math.abs(t-AD.lastT)>.04)AD.lastAdv=now;AD.lastT=t;
@@ -2285,14 +2305,14 @@ setInterval(()=>{
    else if(AD.on&&!AD.manual&&st===1&&now-AD.lastAdv<400)setAd(false);
    if(!AD.on&&st===1&&cur&&!cur.list&&d>1&&now-AD.lastAdv<400&&Math.abs((cur.dur||0)-d)>2)cur.dur=Math.round(d)}
   const tm=pcEl('pcTime');if(tm)tm.textContent=fmtT(t)+' / '+fmtT(d);
-  if(!PC.seeking&&d){const p=t/d;pcEl('pcSeek').value=Math.round(p*1000);pcEl('pcDone').style.width=(p*100)+'%'}
-  const bf=pcEl('pcBuf');if(bf)bf.style.width=(b*100)+'%';
+  if(!PC.seeking&&d){const p=t/d;pcEl('pcSeek').value=Math.round(p*1000);pcEl('pcDone').style.transform='scaleX('+p.toFixed(4)+')'}
+  const bf=pcEl('pcBuf');if(bf)bf.style.transform='scaleX('+b.toFixed(3)+')';
   {let st0=-1;try{st0=yt.getPlayerState()}catch(e){}if(st0===1&&!AD.on){const k=dayKey();S.act[k]=(S.act[k]||0)+.25}}
   if(cur&&cur.list){let vd=null;try{vd=yt.getVideoData&&yt.getVideoData()}catch(e){}
     if(vd&&vd.video_id&&vd.video_id!==MIX.id&&!AD.on){MIX.id=vd.video_id;MIX.title=vd.title||MIX.T[vd.video_id]||'';try{MIX.n=(yt.getPlaylist()||[]).length;MIX.ix=yt.getPlaylistIndex()}catch(e){}if(MIX.title)MIX.T[MIX.id]=MIX.title;else mixTitle(MIX.id,tt=>{MIX.title=tt;mixUI()});mixUI();mixImport()}}
-  const pg=pcEl('pvProg');if(pg&&d)pg.style.width=(t/d*100)+'%';
+  const pg=pcEl('pvProg');if(pg&&d)pg.style.transform='scaleX('+(t/d).toFixed(4)+')';
   const rg=pcEl('muRing');if(rg&&d)rg.setAttribute('stroke-dasharray',(t/d*1000).toFixed(1)+' 1000');
-  const md=pcEl('muDone');if(md&&d){if(!MU.seek){md.style.width=(t/d*100)+'%';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
+  const md=pcEl('muDone');if(md&&d){if(!MU.seek){md.style.transform='scaleX('+(t/d).toFixed(4)+')';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
 },250);
 const pBox=$('#player');
 pBox.addEventListener('click',e=>{
@@ -2315,7 +2335,7 @@ pBox.addEventListener('click',e=>{
   }
 });
 pBox.addEventListener('mousemove',()=>pcShow());
-pBox.addEventListener('input',e=>{if(e.target.id!=='pcSeek')return;PC.seeking=true;pcShow(true);try{const d=yt.getDuration();pcEl('pcTime').textContent=fmtT(e.target.value/1000*d)+' / '+fmtT(d);pcEl('pcDone').style.width=(e.target.value/10)+'%'}catch(_){}});
+pBox.addEventListener('input',e=>{if(e.target.id!=='pcSeek')return;PC.seeking=true;pcShow(true);try{const d=yt.getDuration();pcEl('pcTime').textContent=fmtT(e.target.value/1000*d)+' / '+fmtT(d);pcEl('pcDone').style.transform='scaleX('+(e.target.value/1000)+')'}catch(_){}});
 pBox.addEventListener('change',e=>{if(e.target.id!=='pcSeek')return;try{yt.seekTo(e.target.value/1000*yt.getDuration(),true)}catch(_){}PC.seeking=false;pcShow()});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('pv-fs')){document.body.classList.remove('pv-fs');pcFsLbl();pvFollow(300)}});
 pcSpeedLbl();pcMuteLbl();pcFsLbl();pcState(-1);
@@ -2459,6 +2479,7 @@ apply();onRoute();boot();
 cloudInit();
 syncSrcUI();document.querySelectorAll('#nav .ix').forEach((e,i)=>e.textContent=String(i+1).padStart(2,'0'));
 addEventListener('scroll',()=>document.body.classList.toggle('scrolled',scrollY>8),{passive:true});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)root.setAttribute('data-hidden','');else root.removeAttribute('data-hidden')});
 if(matchMedia('(pointer:fine)').matches&&!RM){
   document.addEventListener('pointermove',e=>{if(!S.settings.motion)return;const t=e.target.closest&&e.target.closest('.vt');
     if(t){const r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;t.style.setProperty('--rx',(-y*7).toFixed(2)+'deg');t.style.setProperty('--ry',(x*9).toFixed(2)+'deg')}
