@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-14">
+<meta name="app-build" content="2026.11.05-15">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1216,6 +1216,30 @@ html.lite *,html.lite *::before,html.lite *::after{animation:none!important;tran
 html.lite body{background-image:none!important}
 html.lite #fx,html.lite .aurora{display:none!important}
 html.lite .top,html.lite .dock,html.lite .pv.mini,html.lite .toast{background:var(--card)!important}
+
+/* ===== v15: buttery spotlight carousel ===== */
+.spot{display:block!important;min-height:0!important;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.spot::before{display:none!important}
+.strack{display:flex;transform:translateX(0)}
+.strack.anim{transition:transform .7s cubic-bezier(.16,.84,.24,1)}
+.sslide{flex:0 0 100%;min-width:0;position:relative;isolation:isolate;overflow:hidden;min-height:clamp(230px,30vw,380px);display:flex;align-items:flex-end}
+.sslide::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(6,6,10,.96) 4%,rgba(6,6,10,.55) 45%,rgba(6,6,10,.08) 80%),linear-gradient(270deg,rgba(6,6,10,.7),transparent 65%)}
+.sslide .sbg{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.sslide .sbg img,.sslide .sbg .sig{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:none!important;transform:translateX(calc(var(--o,0)*32%)) scale(1.12)!important}
+.strack.anim .sbg img,.strack.anim .sbg .sig{transition:transform .7s cubic-bezier(.16,.84,.24,1),opacity .5s}
+.sslide .sc>*{opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .6s cubic-bezier(.16,.84,.24,1)}
+.sslide.on .sc>*{opacity:1;transform:none}
+.sslide.on .sc>:nth-child(1){transition-delay:.12s}.sslide.on .sc>:nth-child(2){transition-delay:.18s}.sslide.on .sc>:nth-child(3){transition-delay:.24s}.sslide.on .sc>:nth-child(4){transition-delay:.3s}
+.spot.drag .sslide .sc>*{transition-delay:0s!important}
+.spot .sdots{z-index:3}
+.spot .sdots button{transition:width .45s cubic-bezier(.16,.84,.24,1),background .3s}
+.spot .sprog{z-index:3}
+.spot .sprog i{animation:sprog 6.5s linear forwards!important}
+.spot.drag .sprog i,.spot:hover .sprog i{animation-play-state:paused!important}
+.spot.drag{cursor:grabbing}
+@media (pointer:fine){.spot{cursor:grab}}
+@media (prefers-reduced-motion:reduce){.strack.anim,.sslide .sc>*{transition:none}}
+html.lite .sslide .sc>*{opacity:1!important;transform:none!important}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1561,16 +1585,35 @@ function actHTML(){if(homeF!=='all')return'';const D=[...Array(7)].map((_,i)=>{c
   <div class="bars">${D.map((x,i)=>`<div class="bc ${i===6?'td':''}"><i style="height:${Math.max(6,x.s/mx*100)}%" title="${fm(x.s)}"></i><span>${N[x.d.getDay()]}</span></div>`).join('')}</div></div>`}
 function tilesHTML(){if(homeF!=='all')return'';const T=S.sections.map(x=>[x,listFor(x.id).length]).filter(([,n])=>n);if(!T.length)return'';
   return`<div class="tiles">${T.map(([x,n])=>`<button class="tl" style="--c:${x.color}" data-hf="${x.id}"><i>${I.play}</i><b>${esc(x.name)}</b><small class="num">${n} مقطع</small></button>`).join('')}</div>`}
-function spotHTML(){if(LITE>1)return'';spotL=homeF==='all'?heroPicks():[];if(!spotL.length)return'';spotI=spotI%spotL.length;return`<div class="spot" id="spot">${spotInner()}</div>`}
-function spotInner(){const v=spotL[spotI],sec=secOf(v.section),isCont=!v.watched&&v.pos>5;
-  return`<div class="sbg">${img(v.vid,'maxresdefault',false)}</div><div class="sc"><span class="tag"><i></i>${isCont?'كمّل من حيث وگفت':v.fav?'من مفضلتك':'مختار إلك'}</span><h1>${esc(v.title)}</h1>
+let SPOTDRAG=0;
+function spotSlide(v,k){const sec=secOf(v.section),isCont=!v.watched&&v.pos>5,near=Math.abs(k-spotI)<=1||(spotI===0&&k===spotL.length-1);
+  return`<div class="sslide${k===spotI?' on':''}" style="--o:${k-spotI}" aria-hidden="${k!==spotI}"><div class="sbg">${img(v.vid,'maxresdefault',false).replace('loading="lazy"',near?'loading="eager"':'loading="lazy"')}</div><div class="sc"><span class="tag"><i></i>${isCont?'كمّل من حيث وگفت':v.fav?'من مفضلتك':'مختار إلك'}</span><h1>${esc(v.title)}</h1>
   <div class="meta">${sec?`<span>${esc(sec.name)}</span><span>·</span>`:''}${v.dur?`<span class="num">${fmtT(v.dur)}</span><span>·</span>`:''}<span class="num">${v.plays} تشغيل</span></div>
-  <div class="acts"><button class="btn pri" data-play="${v.id}">${I.play}${isCont?'كمّل المشاهدة':'شغّل هسه'}</button><button class="btn" data-fav="${v.id}">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'للمفضلة'}</button></div></div>
-  ${spotL.length>1?`<div class="sdots">${spotL.map((_,k)=>`<button class="${k===spotI?'on':''}" data-spot="${k}" aria-label="شريحة ${k+1}"></button>`).join('')}</div><div class="sprog"><i></i></div>`:''}`}
-function spotGo(i){const el=$('#spot');if(!el||!spotL.length)return;spotI=(i+spotL.length)%spotL.length;el.innerHTML=spotInner();spotArm()}
-function spotArm(){clearTimeout(spotT);if(spotL.length>1&&S.settings.motion)spotT=setTimeout(()=>{if($('#spot'))spotGo(spotI+1)},7000)}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-spot]');if(b)spotGo(+b.dataset.spot)});
-(()=>{let sx=null;document.addEventListener('touchstart',e=>{sx=e.target.closest('#spot')?e.touches[0].clientX:null},{passive:true});document.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)spotGo(spotI+(dx>0?1:-1))},{passive:true})})();
+  <div class="acts"><button class="btn pri" data-play="${v.id}" tabindex="${k===spotI?0:-1}">${I.play}${isCont?'كمّل المشاهدة':'شغّل هسه'}</button><button class="btn" data-fav="${v.id}" tabindex="${k===spotI?0:-1}">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'للمفضلة'}</button></div></div></div>`}
+function spotHTML(){if(LITE>1)return'';spotL=homeF==='all'?heroPicks():[];if(!spotL.length)return'';spotI=spotI%spotL.length;
+  return`<div class="spot" id="spot" aria-roledescription="carousel"><div class="strack" id="strack" style="transform:translateX(${spotI*100}%)">${spotL.map(spotSlide).join('')}</div>
+  ${spotL.length>1?`<div class="sdots">${spotL.map((_,k)=>`<button class="${k===spotI?'on':''}" data-spot="${k}" aria-label="شريحة ${k+1}"></button>`).join('')}</div><div class="sprog" id="sprog"><i></i></div>`:''}</div>`}
+function spotSet(f,anim){const tr=document.getElementById('strack');if(!tr)return;tr.classList.toggle('anim',!!anim);tr.style.transform=`translateX(${(f*100).toFixed(3)}%)`;
+  tr.querySelectorAll('.sslide').forEach((x,k)=>x.style.setProperty('--o',(k-f).toFixed(3)))}
+function spotGo(i){const sp=document.getElementById('spot');if(!sp||!spotL.length)return;spotI=(i+spotL.length)%spotL.length;spotSet(spotI,true);
+  sp.querySelectorAll('.sslide').forEach((x,k)=>{const on=k===spotI;x.classList.toggle('on',on);x.setAttribute('aria-hidden',!on);x.querySelectorAll('button').forEach(b=>b.tabIndex=on?0:-1);
+    if(Math.abs(k-spotI)<=1){const im=x.querySelector('img[loading="lazy"]');if(im)im.loading='eager'}});
+  sp.querySelectorAll('[data-spot]').forEach((b,k)=>b.classList.toggle('on',k===spotI));
+  const p=document.getElementById('sprog');if(p)p.innerHTML='<i></i>'}
+function spotArm(){}
+document.addEventListener('animationend',e=>{if(e.animationName==='sprog'&&e.target.closest&&e.target.closest('#sprog'))spotGo(spotI+1)});
+document.addEventListener('click',e=>{if(Date.now()-SPOTDRAG<400&&e.target.closest('#spot')){e.stopPropagation();e.preventDefault();return}const b=e.target.closest('[data-spot]');if(b)spotGo(+b.dataset.spot)},true);
+/* finger / mouse drag that follows you, with momentum and a soft edge */
+(()=>{let d=null;
+  document.addEventListener('pointerdown',e=>{const sp=e.target.closest&&e.target.closest('#spot');if(!sp||spotL.length<2||(e.pointerType==='mouse'&&e.button!==0))return;const t=performance.now();d={x:e.clientX,y:e.clientY,w:sp.clientWidth,dx:0,on:false,id:e.pointerId,sp,vx:0,lx:e.clientX,lt:t}},{passive:true});
+  document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.id)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
+    if(!d.on){if(Math.abs(dx)>7&&Math.abs(dx)>Math.abs(dy)*1.1){d.on=true;d.sp.classList.add('drag');try{d.sp.setPointerCapture(d.id)}catch(_){}}else if(Math.abs(dy)>10){d=null;return}else return}
+    const now=performance.now();d.vx=d.vx*.4+((e.clientX-d.lx)/Math.max(1,now-d.lt))*.6;d.lx=e.clientX;d.lt=now;d.dx=dx;
+    let f=spotI+dx/d.w;const last=spotL.length-1;if(f<0)f*=.3;else if(f>last)f=last+(f-last)*.3;spotSet(f,false)},{passive:true});
+  const up=e=>{if(!d||e.pointerId!==d.id)return;const q=d;d=null;if(!q.on)return;q.sp.classList.remove('drag');SPOTDRAG=Date.now();
+    const r=q.dx/q.w;let to=spotI;if(r>.16||q.vx>.4)to++;else if(r<-.16||q.vx<-.4)to--;to=Math.max(0,Math.min(spotL.length-1,to));spotGo(to)};
+  document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
+})();
 function addVideo(p,sec,title='',note='',kind='video'){
   const lst=p.useList!==undefined?(p.useList?p.list:''):(isMix(p.list)||!p.vid?p.list:'');
   const v={id:uid(),kind,list:lst||'',vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
