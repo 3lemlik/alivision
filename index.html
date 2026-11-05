@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-6">
+<meta name="app-build" content="2026.11.05-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -943,7 +943,26 @@ body:not(.is-playing) .viz i{animation-play-state:paused;opacity:.35}
 .dk .adn{display:none;width:100%;max-width:560px;padding:10px 14px;border-radius:14px;background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--fg);font-size:13px;text-align:center}
 body.ad-on .dk .adn{display:block}
 body.ad-on .viz i,body.ad-on .dk .win{animation-play-state:paused!important}
-@media (max-width:380px){#pcTouch{display:none}}
+@media (max-width:430px){.pc-row{gap:0}.pc-btn{width:33px!important}.pc-spd{min-width:44px!important;padding:0 6px!important}.pc-time{font-size:11px!important}}
+@media (max-width:340px){#pcTouch{display:none}}
+
+/* music plays as sound only: an artwork disc sits over the picture */
+.pc-cover{display:none;position:absolute;inset:0;z-index:0;overflow:hidden;background:#0b0c10;pointer-events:none}
+.pv.mus .pc-cover{display:grid;place-items:center}
+.pv.ad .pc-cover{display:none!important}
+.pc-cover .cvbg{position:absolute;inset:-20%;background:#120c14 var(--cv) center/cover;filter:blur(26px) saturate(1.5) brightness(.55)}
+.pc-cover .disc{position:relative;height:78%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#0c0c10 0 2px,#17171d 2px 4px);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 18px 40px rgba(0,0,0,.6),inset 0 0 30px rgba(0,0,0,.8);display:grid;place-items:center;animation:spin 7s linear infinite;animation-play-state:paused}
+.pc-cover .disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,transparent,rgba(255,255,255,.12) 8%,transparent 16%,transparent 50%,rgba(255,255,255,.08) 58%,transparent 66%)}
+.pc-cover .disc span{width:44%;aspect-ratio:1;border-radius:50%;background:#222 var(--cv) center/cover;box-shadow:0 0 0 3px rgba(var(--acc-rgb),.85),0 0 22px rgba(var(--acc-rgb),.5);position:relative}
+.pc-cover .disc span::after{content:"";position:absolute;inset:42%;border-radius:50%;background:#0b0c10;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+body.is-playing .pc-cover .disc{animation-play-state:running}
+.pc-cover .cveq{position:absolute;bottom:10px;right:12px;display:flex;gap:3px;align-items:flex-end;height:18px}
+.pc-cover .cveq i{width:3px;height:30%;border-radius:2px;background:var(--accent);animation:eqb .9s ease-in-out infinite alternate;animation-play-state:paused}
+.pc-cover .cveq i:nth-child(2){animation-delay:-.3s}.pc-cover .cveq i:nth-child(3){animation-delay:-.6s}.pc-cover .cveq i:nth-child(4){animation-delay:-.15s}
+body.is-playing .pc-cover .cveq i{animation-play-state:running}
+.pv.mini.mus .pc-cover .disc{height:86%}.pv.mini.mus .pc-cover .cveq{display:none}
+@media (prefers-reduced-motion:reduce){.pc-cover .disc,.pc-cover .cveq i{animation:none}}
+[hidden]{display:none!important}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -976,7 +995,7 @@ body.ad-on .viz i,body.ad-on .dk .win{animation-play-state:paused!important}
 
 <main class="wrap gut" id="app"></main>
 <div id="pv" class="pv" hidden>
-  <div class="player pv-frame" id="player"><div id="ytp"></div><div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-fb" id="pcFb"></div><button class="pc-ad" id="pcAd" type="button"></button><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn" id="pcTouch" aria-label="لمس المقطع مباشرة (للإعلانات)" title="لمس مباشر (إذا طلع إعلان)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></button><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div></div>
+  <div class="player pv-frame" id="player"><div id="ytp"></div><div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-cover" id="pcCover" aria-hidden="true"><div class="cvbg"></div><div class="disc"><span></span></div><div class="cveq"><i></i><i></i><i></i><i></i><i></i></div></div><div class="pc-fb" id="pcFb"></div><button class="pc-ad" id="pcAd" type="button"></button><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn" id="pcTouch" aria-label="لمس المقطع مباشرة (للإعلانات)" title="لمس مباشر (إذا طلع إعلان)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></button><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div></div>
   <span class="pv-hint" aria-hidden="true"></span>
   <div class="pv-bar">
     <button class="pv-t" id="pvOpen" aria-label="افتح المقطع"><b id="pvTitle"></b><small id="pvSub"></small></button>
@@ -1072,7 +1091,7 @@ delete S.sections;delete S.videos;delete S.lock;delete S.unlocked;
 const LIB=()=>S.src==='pub'?S.pub:S.mine;
 Object.defineProperty(S,'sections',{get:()=>LIB().sections,set:v=>{LIB().sections=v},configurable:true,enumerable:false});
 Object.defineProperty(S,'videos',{get:()=>LIB().videos,set:v=>{LIB().videos=v},configurable:true,enumerable:false});
-function fixLib(L){L.sections=L.sections||[];L.videos=(L.videos||[]).map(v=>({marks:[],pos:0,dur:0,plays:0,...v,marks:v.marks||[]}));if(!L.sections.some(x=>x.music))L.sections.push({id:'music',name:'الموسيقى',color:'#8b5cff',music:true});return L}
+function fixLib(L){L.sections=L.sections||[];const ms=new Set(L.sections.filter(x=>x.music).map(x=>x.id));L.sections=L.sections.filter(x=>!x.music);L.videos=(L.videos||[]).map(v=>{const r={marks:[],pos:0,dur:0,plays:0,...v,marks:v.marks||[]};if(ms.has(r.section)){r.section='';if(!r.kind)r.kind='both'}if(!['video','music','both'].includes(r.kind))r.kind='video';return r});return L}
 fixLib(S.mine);fixLib(S.pub);
 const MU={shuf:false,seek:false};
 if(!S.settings.name||S.settings.name==='الدزاز فيجن')S.settings.name='علي فيجن';
@@ -1097,9 +1116,11 @@ function sig(vid,wave=true){const h=hue(vid);let p='';for(let i=0;i<=24;i++){p+=
   return`<div class="sig" style="background:linear-gradient(135deg,hsl(${h} 50% 18%),hsl(${(h+40)%360} 40% 8%) 70%)">${wave?`<svg class="wave" viewBox="0 0 240 30" preserveAspectRatio="none"><polyline points="${p}" fill="none" stroke="var(--accent)" stroke-width="2"/></svg><span class="id">${esc(vid)}</span>`:''}</div>`}
 const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="this.remove()" onload="if(this.naturalWidth<=120)this.remove()">`;
 const secOf=id=>S.sections.find(s=>s.id===id);
-const isMusic=v=>!!(v&&(S.sections.find(s=>s.id===v.section)||{}).music);
+const isVid=v=>!v||v.kind!=='music';
+const isMusic=v=>!!v&&(v.kind==='music'||v.kind==='both');
+const KL={video:'الفيديو بس',music:'الموسيقى بس',both:'الفيديو والموسيقى'};
 function findV(id){let v=S.videos.find(x=>x.id===id);if(v)return v;const o=S.src==='pub'?'mine':'pub';v=(o==='pub'?S.pub:S.mine).videos.find(x=>x.id===id);if(v){S.src=o;saveLocal();syncSrcUI()}return v||null}
-function goV(id){const v=S.videos.find(x=>x.id===id)||S.pub.videos.find(x=>x.id===id)||S.mine.videos.find(x=>x.id===id);let m=false;if(v){const L=S.pub.videos.includes(v)?S.pub:S.mine;m=!!(L.sections.find(x=>x.id===v.section)||{}).music}go((m?'m-':'w-')+id)}
+function goV(id,mode){if(!mode)mode=route.startsWith('m-')?'m':route.startsWith('w-')?'w':null;if(!mode){const v=S.videos.find(x=>x.id===id)||S.pub.videos.find(x=>x.id===id)||S.mine.videos.find(x=>x.id===id);mode=v&&v.kind==='music'?'m':'w'}go(mode+'-'+id)}
 const pct=v=>v.watched?100:(v.dur?Math.min(100,Math.round(v.pos/v.dur*100)):0);
 const ago=t=>{if(!t)return'';const d=(Date.now()-t)/1000;if(d<60)return'هسه';if(d<3600)return`قبل ${Math.floor(d/60)} د`;if(d<86400)return`قبل ${Math.floor(d/3600)} س`;const n=Math.floor(d/86400);return n===1?'أمس':`قبل ${n} يوم`};
 
@@ -1146,7 +1167,7 @@ function openMenu(btn,id){
    <button data-watch="${id}">${I.eye}${v.watched?'تعليم كغير مشاهد':'تعليم كمشاهد'}</button>
    <button data-copy="${id}">${I.copy}نسخ الرابط</button>
    <a href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}الرابط الأصلي</a>
-   ${ed?`<hr><button data-edit="${id}">${I.edit}تعديل</button><button data-mv="${id}">${I.move}نقل لقسم</button><button class="danger" data-del="${id}">${I.trash}حذف</button>`:''}`;
+   ${ed?`<hr><button data-edit="${id}">${I.edit}تعديل</button><button data-tomus="${id}">${I.music}يظهر بـ: ${KL[v.kind||'video']}</button><button data-mv="${id}">${I.move}نقل لقسم</button><button class="danger" data-del="${id}">${I.trash}حذف</button>`:''}`;
   $('#menuL').append(m);
   const r=btn.getBoundingClientRect(),mw=m.offsetWidth,mh=m.offsetHeight;
   let x=Math.min(Math.max(8,r.right-mw),innerWidth-mw-8),y=r.bottom+6;if(y+mh>innerHeight-8)y=Math.max(8,r.top-mh-6);
@@ -1154,7 +1175,7 @@ function openMenu(btn,id){
 }
 function moveMenu(btn,id){
   closeMenu();const v=S.videos.find(x=>x.id===id);const m=document.createElement('div');m.className='menu';
-  m.innerHTML=S.sections.map(s=>`<button data-mvto="${s.id}"><span style="width:9px;height:9px;border-radius:2px;transform:rotate(45deg);background:${s.color}"></span>${esc(s.name)}${s.id===v.section?' ✓':''}</button>`).join('')||'<div class="muted" style="padding:10px">ماكو أقسام</div>';
+  m.innerHTML=S.sections.filter(s=>!s.music).map(s=>`<button data-mvto="${s.id}"><span style="width:9px;height:9px;border-radius:2px;transform:rotate(45deg);background:${s.color}"></span>${esc(s.name)}${s.id===v.section?' ✓':''}</button>`).join('')||'<div class="muted" style="padding:10px">ماكو أقسام</div>';
   $('#menuL').append(m);const r=btn.getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,innerWidth-m.offsetWidth-8))+'px';m.style.top=Math.min(r.bottom+6,innerHeight-m.offsetHeight-8)+'px';
   m.onclick=e=>{const b=e.target.closest('[data-mvto]');if(!b)return;v.section=b.dataset.mvto;save();closeMenu();rerender();toast('انتقل إلى '+secOf(v.section).name)};
 }
@@ -1166,7 +1187,7 @@ function card(v){
   return`<article class="vc" data-id="${v.id}">
   <button class="vt" data-play="${v.id}" aria-label="تشغيل ${esc(v.title)}">${img(v.vid)}
    <span class="ov"><span class="playorb">${I.play}</span></span>
-   ${isMusic(v)?`<span class="mus-b">${I.music}موسيقى</span>`:''}${v.ex?'<span class="bdg ex">مثال</span>':''}${v.watched?`<span class="bdg wd">${I.check}شوهد</span>`:''}
+   ${v.kind==='both'?`<span class="mus-b">${I.music}وبالموسيقى</span>`:''}${v.ex?'<span class="bdg ex">مثال</span>':''}${v.watched?`<span class="bdg wd">${I.check}شوهد</span>`:''}
    ${v.dur?`<span class="bdg dur num">${fmtT(v.dur)}</span>`:''}
    ${p>0&&p<100?`<span class="bar"><i style="width:${p}%"></i></span>`:''}
   </button>
@@ -1187,7 +1208,7 @@ function emptyBox(t,s){return`<div class="empty"><div class="eo">${I.play}</div>
 
 /* ================= lists ================= */
 function listFor(f,q=''){
-  let v=S.videos.slice();
+  let v=S.videos.filter(isVid);
   if(f==='fav')v=v.filter(x=>x.fav);else if(f==='unw')v=v.filter(x=>!x.watched);else if(f==='cont')v=v.filter(x=>!x.watched&&x.pos>5);else if(f&&f!=='all')v=v.filter(x=>x.section===f);
   if(q){const k=q.toLowerCase();v=v.filter(x=>(x.title+' '+x.note+' '+(secOf(x.section)?.name||'')).toLowerCase().includes(k))}
   const so=S.settings.sort;
@@ -1198,9 +1219,10 @@ function listFor(f,q=''){
 /* ================= HOME ================= */
 let heroI=0,heroT=null,heroList=[];
 function heroPicks(){
-  const cont=S.videos.filter(v=>!v.watched&&v.pos>5).sort((a,b)=>(b.last||0)-(a.last||0));
-  const fav=S.videos.filter(v=>v.fav&&!cont.includes(v));
-  const rest=S.videos.slice().sort((a,b)=>b.added-a.added).filter(v=>!cont.includes(v)&&!fav.includes(v));
+  const VS=S.videos.filter(isVid);
+  const cont=VS.filter(v=>!v.watched&&v.pos>5).sort((a,b)=>(b.last||0)-(a.last||0));
+  const fav=VS.filter(v=>v.fav&&!cont.includes(v));
+  const rest=VS.slice().sort((a,b)=>b.added-a.added).filter(v=>!cont.includes(v)&&!fav.includes(v));
   return[...cont,...fav,...rest].slice(0,5);
 }
 function heroHTML(v){
@@ -1228,19 +1250,19 @@ function renderHome(){
   const cnt=id=>listFor(id).length;
   const sys=[['all','الكل'],['cont','كمّل المشاهدة'],['fav','المفضلة'],['unw','ما شفتها']].filter(([id])=>id==='all'||cnt(id));
   const chips=sys.map(([id,n])=>`<button class="chip ${homeF===id?'on':''}" data-hf="${id}">${n}${id!=='all'?`<span class="n num">${cnt(id)}</span>`:''}</button>`).join('')
-    +S.sections.map(s=>`<button class="chip ${homeF===s.id?'on':''}" data-hf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}</button>`).join('')
+    +S.sections.filter(s=>!s.music).map(s=>`<button class="chip ${homeF===s.id?'on':''}" data-hf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}</button>`).join('')
     +(editable()?`<button class="chip ghostc" id="mngSec">${sv('folder',15)}الأقسام</button>`:'');
   const L=listFor(homeF);
   const cont=homeF==='all'?listFor('cont').sort((a,b)=>(b.last||0)-(a.last||0)).slice(0,12):[];
   $('#app').innerHTML=`<div class="view yth">
    ${spotHTML()}
    <div class="chips ytchips">${chips}</div>
-   ${editable()&&!S.videos.length?`<form class="qadd" id="qadd" autocomplete="off"><div class="qi">${I.link}<input id="qUrl" placeholder="الصق رابط يوتيوب هنا وخلي الباقي عليّ…" aria-label="رابط يوتيوب"></div>
-    <select id="qSec" aria-label="القسم">${S.sections.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="">بدون قسم</option></select>
+   ${editable()&&!S.videos.some(isVid)?`<form class="qadd" id="qadd" autocomplete="off"><div class="qi">${I.link}<input id="qUrl" placeholder="الصق رابط يوتيوب هنا وخلي الباقي عليّ…" aria-label="رابط يوتيوب"></div>
+    <select id="qSec" aria-label="القسم">${S.sections.filter(s=>!s.music).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="">بدون قسم</option></select>
     <button class="btn pri" type="submit">${I.plus}إضافة</button><div class="qprev" id="qPrev" hidden></div></form>`:''}
-   ${S.videos.length?'':`<div style="margin-top:18px">${editable()?emptyBox(S.src==='pub'?'المحتوى العام فارغ':'مكتبتك فارغة','الصق أول رابط بالمربع اللي فوگ، أو دوس + وضيفه.'):emptyBox('المحتوى العام فارغ لحد الآن','ينضاف محتوى قريباً. تگدر تحوّل للمحتوى الشخصي وتضيف مقاطعك.')}</div>`}
+   ${S.videos.some(isVid)?'':`<div style="margin-top:18px">${editable()?emptyBox(S.src==='pub'?'المحتوى العام فارغ':'مكتبتك فارغة','الصق أول رابط بالمربع اللي فوگ، أو دوس + وضيفه.'):emptyBox('المحتوى العام فارغ لحد الآن','ينضاف محتوى قريباً. تگدر تحوّل للمحتوى الشخصي وتضيف مقاطعك.')}</div>`}
    ${cont.length?shelf('كمّل المشاهدة',cont):''}
-   ${S.videos.length?`<div class="grid ytgrid">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','اختار قسم ثاني، أو دوس + وضيف مقطع.')}</div>`:''}
+   ${S.videos.some(isVid)?`<div class="grid ytgrid">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','اختار قسم ثاني، أو دوس + وضيف مقطع.')}</div>`:''}
    <p class="foot">${esc(S.settings.name)} · تصميم وبرمجة <b>علي مالك</b></p></div>`;
   spotArm();
   const qa=$('#qadd');if(qa){
@@ -1253,7 +1275,7 @@ function renderHome(){
 let spotI=0,spotT=null,spotL=[];
 function spotHTML(){spotL=homeF==='all'?heroPicks():[];if(!spotL.length)return'';spotI=spotI%spotL.length;return`<div class="spot" id="spot">${spotInner()}</div>`}
 function spotInner(){const v=spotL[spotI],sec=secOf(v.section),isCont=!v.watched&&v.pos>5;
-  return`<div class="sbg">${img(v.vid,'maxresdefault',false)}</div><div class="sc"><span class="tag"><i></i>${isCont?'كمّل من حيث وگفت':v.fav?'من مفضلتك':isMusic(v)?'موسيقى':'مختار إلك'}</span><h1>${esc(v.title)}</h1>
+  return`<div class="sbg">${img(v.vid,'maxresdefault',false)}</div><div class="sc"><span class="tag"><i></i>${isCont?'كمّل من حيث وگفت':v.fav?'من مفضلتك':'مختار إلك'}</span><h1>${esc(v.title)}</h1>
   <div class="meta">${sec?`<span>${esc(sec.name)}</span><span>·</span>`:''}${v.dur?`<span class="num">${fmtT(v.dur)}</span><span>·</span>`:''}<span class="num">${v.plays} تشغيل</span></div>
   <div class="acts"><button class="btn pri" data-play="${v.id}">${I.play}${isCont?'كمّل المشاهدة':'شغّل هسه'}</button><button class="btn" data-fav="${v.id}">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'للمفضلة'}</button></div></div>
   ${spotL.length>1?`<div class="sdots">${spotL.map((_,k)=>`<button class="${k===spotI?'on':''}" data-spot="${k}" aria-label="شريحة ${k+1}"></button>`).join('')}</div><div class="sprog"><i></i></div>`:''}`}
@@ -1261,9 +1283,9 @@ function spotGo(i){const el=$('#spot');if(!el||!spotL.length)return;spotI=(i+spo
 function spotArm(){clearTimeout(spotT);if(spotL.length>1&&S.settings.motion)spotT=setTimeout(()=>{if($('#spot'))spotGo(spotI+1)},7000)}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-spot]');if(b)spotGo(+b.dataset.spot)});
 (()=>{let sx=null;document.addEventListener('touchstart',e=>{sx=e.target.closest('#spot')?e.touches[0].clientX:null},{passive:true});document.addEventListener('touchend',e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)spotGo(spotI+(dx>0?1:-1))},{passive:true})})();
-function addVideo(p,sec,title='',note=''){
-  const v={id:uid(),vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
-  S.videos.push(v);save();rerender();toast('انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
+function addVideo(p,sec,title='',note='',kind='video'){
+  const v={id:uid(),kind,vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
+  S.videos.push(v);save();rerender();toast(kind==='music'?'انضافت للموسيقى':kind==='both'?'انضاف للفيديو والموسيقى':'انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
   if(!title)fetchTitle(v);return v;
 }
 function fetchTitle(v){
@@ -1288,7 +1310,7 @@ function renderLibrary(f){
     <div class="seg" role="group" aria-label="طريقة العرض"><button id="vG" class="${S.settings.view==='grid'?'on':''}" aria-label="شبكة">${I.grid}</button><button id="vL" class="${S.settings.view==='list'?'on':''}" aria-label="قائمة">${I.list}</button></div>
    </div></div>
   <div class="chips">${sys.map(([id,n,c])=>`<button class="chip ${libF===id?'on':''}" data-lf="${id}"><span class="d" style="background:${c}"></span>${n}<span class="n num">${cnt(id)}</span></button>`).join('')}
-   ${S.sections.map(s=>`<button class="chip ${libF===s.id?'on':''}" data-lf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}<span class="n num">${cnt(s.id)}</span></button>`).join('')}
+   ${S.sections.filter(s=>!s.music).map(s=>`<button class="chip ${libF===s.id?'on':''}" data-lf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}<span class="n num">${cnt(s.id)}</span></button>`).join('')}
    ${editable()?`<button class="chip" id="mngSec">${sv('folder',15)}إدارة الأقسام</button>`:''}</div>
   <div class="grid ${S.settings.view==='list'?'list':''}">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','الصق رابط يوتيوب بأي مكان بالصفحة حتى تضيفه.')}</div>
   <p class="foot">تصميم وبرمجة <b>علي مالك</b></p></div>`;
@@ -1302,10 +1324,12 @@ function renderLibrary(f){
 }
 
 /* ================= MUSIC ================= */
+function toggleKind(v){const o=['video','music','both'];v.kind=o[(o.indexOf(v.kind||'video')+1)%3];save();rerender();toast('صار يظهر بـ: '+KL[v.kind])}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tomus]');if(!b)return;closeMenu();const v=S.videos.find(x=>x.id===b.dataset.tomus);if(v&&editable())toggleKind(v)});
 function musicList(){return S.videos.filter(isMusic).sort((a,b)=>b.added-a.added)}
 function trk(v,i){const now=cur&&cur.id===v.id;return`<div class="trk ${now?'now':''}" role="button" tabindex="0" data-mplay="${v.id}"><span class="n">${now?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="cv">${img(v.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(v.title)}</b><small class="num">${v.plays} تشغيل${v.fav?' · بالمفضلة':''}</small></span><span class="d">${v.dur?fmtT(v.dur):''}</span><button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>`}
 function renderMusic(){
-  const L=musicList(),ms=S.sections.find(x=>x.music),tot=L.reduce((a,v)=>a+(v.dur||0),0);
+  const L=musicList(),tot=L.reduce((a,v)=>a+(v.dur||0),0);
   $('#app').innerHTML=`<div class="view">
    <div class="mhead"><div class="mt"><small>MUSIC ── ALI-VISION</small><h1>الموسيقى</h1><p><span class="num">${L.length}</span> أغنية${tot?` · <span class="num">${fmtT(tot)}</span>`:''}</p></div>
     <div class="ma">${L.length?`<button class="btn pri" id="mPlay">${I.play}تشغيل الكل</button><button class="btn" id="mShuf">${sv('shuffle',16)}عشوائي</button>`:''}${editable()?`<button class="btn" id="mAdd">${sv('plus',16)}إضافة أغنية</button>`:''}</div>
@@ -1313,11 +1337,11 @@ function renderMusic(){
    <div class="tracks">${L.length?L.map(trk).join(''):emptyBox('ماكو موسيقى بعد',editable()?'دوس «إضافة أغنية» وحط رابطها، تنحفظ بقسم الموسيقى.':'تنضاف أغاني قريباً.')}</div>
    <p class="foot">تصميم وبرمجة <b>علي مالك</b></p></div>`;
   const ids=L.map(v=>v.id);
-  const mp=$('#mPlay');if(mp)mp.onclick=()=>{MU.shuf=false;playCtx(ids[0],ids,'الموسيقى')};
-  const mh=$('#mShuf');if(mh)mh.onclick=()=>{MU.shuf=true;const a=ids.slice().sort(()=>Math.random()-.5);playCtx(a[0],a,'الموسيقى · عشوائي')};
-  const ma=$('#mAdd');if(ma)ma.onclick=()=>openEditor(null,'',ms&&ms.id);
+  const mp=$('#mPlay');if(mp)mp.onclick=()=>{MU.shuf=false;playCtx(ids[0],ids,'الموسيقى','m')};
+  const mh=$('#mShuf');if(mh)mh.onclick=()=>{MU.shuf=true;const a=ids.slice().sort(()=>Math.random()-.5);playCtx(a[0],a,'الموسيقى · عشوائي','m')};
+  const ma=$('#mAdd');if(ma)ma.onclick=()=>openEditor(null,'',undefined,'music');
 }
-document.addEventListener('click',e=>{const m=e.target.closest('[data-mplay]');if(!m||e.target.closest('[data-menu]'))return;const ids=musicList().map(v=>v.id);if(!MU.shuf||!Q.ids.includes(m.dataset.mplay))playCtx(m.dataset.mplay,ids,'الموسيقى');else goV(m.dataset.mplay)});
+document.addEventListener('click',e=>{const m=e.target.closest('[data-mplay]');if(!m||e.target.closest('[data-menu]'))return;const ids=musicList().map(v=>v.id);if(!MU.shuf||!Q.ids.includes(m.dataset.mplay))playCtx(m.dataset.mplay,ids,'الموسيقى','m');else goV(m.dataset.mplay,'m')});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-mplay]'))e.target.click()});
 function renderMusicPlayer(id){
   const v=findV(id);if(!v){go('music');return}
@@ -1331,7 +1355,7 @@ function renderMusicPlayer(id){
    <div class="dk"><div class="amb">${img(v.vid,'mqdefault',false)}</div>
     <div class="win"><div class="pslot" id="pslot"></div></div>
     <div class="mi"><small>NOW · PLAYING ── MUSIC</small><h1>${esc(v.title)}</h1><p>${esc(Q.name||'الموسيقى')} · <span class="num">${qi+1}/${Q.ids.length}</span></p></div>
-    <div class="adn">إعلان يشتغل هسه. دوس «تخطي» بزاوية المقطع فوگ من يطلع، والأغنية تبدي وحدها.</div>
+    <div class="adn">إعلان يشتغل هسه. دوس «تخطي» بزاوية الإطار من يطلع، والأغنية تبدي وحدها.</div>
     <div class="viz" aria-hidden="true">${viz}</div>
     <div class="mseek"><div class="tr"><i id="muDone" style="width:0"></i><input type="range" id="muSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="tm"><span id="muT1">0:00</span><span id="muT2">${v.dur?fmtT(v.dur):'0:00'}</span></div></div>
     <div class="mctl">
@@ -1363,14 +1387,14 @@ function renderMusicPlayer(id){
   $('#wFav').onclick=()=>{v.fav=!v.fav;save();const b=$('#wFav');b.classList.toggle('on',v.fav);b.innerHTML=(v.fav?I.heartF:I.heart)+(v.fav?'بالمفضلة':'مفضلة')};
   $('#wCopy').onclick=()=>copy(ytUrl(v,yt?.getCurrentTime?.()||v.start),'انتسخ الرابط');
   const we=$('#wEdit');if(we)we.onclick=()=>openEditor(v.id);
-  pvShow('full');
+  PV.kind=route.startsWith('m-')?'music':'video';pvShow('full');
   if(!same)mountPlayer(v);
   pvFollow(900);
 }
 
 /* ================= WATCH ================= */
 let Q={ids:[],name:''},cur=null,yt=null,ytTimer=null,ytApi=null,cine=false,loopOn=false,cdT=null;
-function playCtx(id,ids,name){Q={ids:ids||[],name:name||''};goV(id)}
+function playCtx(id,ids,name,mode){Q={ids:ids||[],name:name||''};goV(id,mode)}
 function defaultQueue(v){const sec=secOf(v.section);Q={ids:(sec?listFor(sec.id):listFor('all')).map(x=>x.id),name:sec?sec.name:'كل المقاطع'}}
 function loadYTApi(){
   if(ytApi)return ytApi;
@@ -1386,10 +1410,11 @@ const IC_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H
 function pvState(st){const b=$('#pvPlay');if(b)b.innerHTML=st===1||st===3?IC_PAUSE:I.play}
 function pvShow(mode){
   const pv=$('#pv');pv.hidden=false;PV.mode=mode;
-  pv.classList.toggle('mini',mode==='mini');pv.classList.toggle('full',mode==='full');pv.classList.toggle('mus',mode==='full'?route.startsWith('m-'):isMusic(cur));pv.classList.remove('snap','dragging');pv.style.opacity='';document.body.classList.toggle('pv-mini',mode==='mini');
+  pv.classList.toggle('mini',mode==='mini');pv.classList.toggle('full',mode==='full');pv.classList.toggle('mus',PV.kind==='music');pv.classList.remove('snap','dragging');pv.style.opacity='';document.body.classList.toggle('pv-mini',mode==='mini');
   if(mode==='mini'){pv.style.cssText='';$('#pvTitle').textContent=cur?cur.title:'';$('#pvSub').textContent=Q.name||(cur&&secOf(cur.section)?.name)||'';
     try{pvState(yt&&yt.getPlayerState?yt.getPlayerState():1)}catch(e){pvState(1)}}
   else pvSync();
+  setCover();
 }
 function pvSync(){
   if(PV.mode!=='full')return;const sl=$('#pslot'),pv=$('#pv');if(!sl)return;
@@ -1400,8 +1425,8 @@ function pvFollow(ms){const end=performance.now()+ms;const f=()=>{pvSync();if(pe
 addEventListener('resize',()=>requestAnimationFrame(pvSync));
 document.addEventListener('toggle',e=>{if(e.target.matches&&e.target.matches('.wmore'))pvFollow(300)},true);
 try{new ResizeObserver(()=>pvSync()).observe($('#app'))}catch(e){}
-$('#pvOpen').onclick=()=>{if(PV.id)goV(PV.id)};
-$('#pvPlay').onclick=()=>{try{yt.getPlayerState()===1?yt.pauseVideo():yt.playVideo()}catch(e){if(PV.id)goV(PV.id)}};
+$('#pvOpen').onclick=()=>{if(PV.id)goV(PV.id,PV.kind==='music'?'m':'w')};
+$('#pvPlay').onclick=()=>{try{yt.getPlayerState()===1?yt.pauseVideo():yt.playVideo()}catch(e){if(PV.id)goV(PV.id,PV.kind==='music'?'m':'w')}};
 $('#pvClose').innerHTML=I.x;
 $('#pvClose').onclick=()=>stopPlayer();
 function renderWatch(id){
@@ -1459,7 +1484,7 @@ function renderWatch(id){
     if(!editable()){toast('الموقع مقفل');return}
     const t=yt?.getCurrentTime?.();if(t==null){toast('العلامات تشتغل بعد رفع الموقع على الاستضافة');return}
     v.marks.push({t:Math.floor(t),l:'لحظة '+fmtT(t)});v.marks.sort((a,b)=>a.t-b.t);save();renderMarks();toast('انحفظت العلامة عند '+fmtT(t))};
-  pvShow('full');
+  PV.kind=route.startsWith('m-')?'music':'video';pvShow('full');
   if(!same)mountPlayer(v);else{const pb=$('#player');pb.querySelectorAll('.nextup').forEach(e=>e.remove())}
   pvFollow(900);
 }
@@ -1473,7 +1498,7 @@ function mountPlayer(v){
   const box=$('#player');PV.id=v.id;AD.mt=Date.now();AD.lastAdv=Date.now();if(AD.on)setAd(false);clearInterval(cdT);clearInterval(ytTimer);box.querySelectorAll('.nextup').forEach(e=>e.remove());
   const fallbackMsg=()=>{try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>افتح الموقع من رابط GitHub Pages حتى تشتغل المقاطع.</p></div>`};
   if(!ONLINE){fallbackMsg();return}
-  ensureYtp();
+  ensureYtp();setCover();
   const resume=(!v.watched&&v.pos>5&&(!v.dur||v.pos<v.dur-10))?Math.floor(v.pos):(v.start||0);
   if(yt&&yt.loadVideoById){try{yt.loadVideoById({videoId:v.vid,startSeconds:resume});yt.setPlaybackRate(S.settings.speed)}catch(e){}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));return}
   loadYTApi().then(()=>{
@@ -1489,7 +1514,7 @@ function mountPlayer(v){
             if(loopOn){yt.seekTo(0);yt.playVideo();return}
             pcEnded(v);
             const i=Q.ids.indexOf(v.id),nx=S.videos.find(x=>x.id===Q.ids[i+1]);
-            if((S.settings.autonext||isMusic(v))&&nx){if(route.startsWith('m-'))goV(nx.id);else if(route.startsWith('w-'))countdown(nx);else{cur=nx;nx.plays++;nx.last=Date.now();save();mountPlayer(nx);pvShow('mini')}}}
+            if((S.settings.autonext||PV.kind==='music')&&nx){if(route.startsWith('m-'))goV(nx.id);else if(route.startsWith('w-'))countdown(nx);else{cur=nx;nx.plays++;nx.last=Date.now();save();mountPlayer(nx);pvShow('mini')}}}
         },
         onError:e=>{const c=e.data,v=cur||{};try{yt.destroy()}catch(_){}yt=null;box.innerHTML=`<div class="pmsg"><b>${c===101||c===150?'صاحب المقطع منع تشغيله داخل المواقع':c===100?'المقطع محذوف أو خاص':'ما گدرنا نشغّل المقطع'}</b><p>تگدر تفتح رابطه الأصلي.</p><a class="btn pri" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}الرابط الأصلي</a></div>`}
       }});
@@ -1503,14 +1528,17 @@ function countdown(nx){
 }
 
 /* ================= editor ================= */
-function secOptions(sel){return S.sections.map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${esc(s.name)}</option>`).join('')+`<option value="" ${!sel?'selected':''}>بدون قسم</option><option value="__new">+ قسم جديد…</option>`}
-function openEditor(id,pre='',secPre){
+function secOptions(sel){return S.sections.filter(s=>!s.music).map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${esc(s.name)}</option>`).join('')+`<option value="" ${!sel?'selected':''}>بدون قسم</option><option value="__new">+ قسم جديد…</option>`}
+function openEditor(id,pre='',secPre,kindPre){
   if(!editable()){toast('المحتوى العام يعدّله المدير بس');return}
   const v=id?S.videos.find(x=>x.id===id):null;
-  const defSec=v?v.section:(secPre||S.sections.find(s=>s.id===libF)?.id||S.sections.find(s=>!s.music)?.id||'');
+  const MS=S.sections.find(s=>s.music);
+  let ty=v?({video:'vid',music:'mus',both:'both'}[v.kind]||'vid'):(kindPre==='music'?'mus':'vid');
+  let defSec=v?v.section:(secPre||S.sections.find(s=>s.id===libF&&!s.music)?.id||S.sections.find(s=>!s.music)?.id||'');if(MS&&defSec===MS.id)defSec='';
   openLayer(`<div class="panel" role="dialog" aria-modal="true" aria-labelledby="edH">
-   <div class="ph"><h4 id="edH">${v?'تعديل المقطع':'إضافة مقطع'}</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
+   <div class="ph"><h4 id="edH">${v?'تعديل':'إضافة'}</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
    <div class="pb">
+    <div class="field"><label>يظهر بـ</label><div class="seg" role="group" id="fType" style="display:flex;width:100%"><button type="button" data-ty="vid" style="flex:1">${sv('film',15)}فيديو</button><button type="button" data-ty="mus" style="flex:1">${sv('music',15)}موسيقى</button><button type="button" data-ty="both" style="flex:1">الاثنين</button></div></div>
     ${v?'':`<div class="seg" style="align-self:flex-start"><button class="on" data-mode="one">رابط واحد</button><button data-mode="bulk">عدة روابط</button></div>`}
     <div id="mOne" style="display:flex;flex-direction:column;gap:14px">
      <div class="field"><label for="fUrl">رابط يوتيوب</label><input class="in ltr" id="fUrl" placeholder="https://youtu.be/…" value="${esc(v?ytUrl(v):pre)}" autofocus></div>
@@ -1519,12 +1547,14 @@ function openEditor(id,pre='',secPre){
      <div class="field"><label for="fNote">ملاحظة</label><input class="in" id="fNote" value="${esc(v?.note||'')}" placeholder="اختياري"></div>
     </div>
     <div id="mBulk" hidden><div class="field"><label for="fBulk">الصق الروابط، كل رابط بسطر</label><textarea class="in ltr" id="fBulk" placeholder="https://youtu.be/…"></textarea></div><div class="muted" id="bInfo"></div></div>
-    <div class="field"><label for="fSec">القسم</label><select class="in" id="fSec">${secOptions(defSec)}</select></div>
+    <div class="field" id="fSecF"><label for="fSec">القسم</label><select class="in" id="fSec">${secOptions(defSec)}</select></div>
     <div class="field" id="nsF" hidden><label for="fNS">اسم القسم الجديد</label><input class="in" id="fNS" placeholder="مثلاً: تمارين الأرجل"></div>
    </div>
    <div class="pf"><button class="btn pri" id="fSave">${v?'حفظ':'إضافة'}</button><button class="btn" data-close>رجوع</button></div></div>`);
   let mode='one',parsed=null;
   const fu=$('#fUrl'),det=$('#det');
+  const setTy=t=>{ty=t;document.querySelectorAll('#fType [data-ty]').forEach(b=>b.classList.toggle('on',b.dataset.ty===t));$('#fSecF').hidden=t==='mus';if(t==='mus')$('#nsF').hidden=true;$('#edH').textContent=(v?'تعديل ':'إضافة ')+(t==='mus'?'أغنية':t==='both'?'مقطع (فيديو وموسيقى)':'مقطع فيديو')};
+  document.querySelectorAll('#fType [data-ty]').forEach(b=>b.onclick=()=>setTy(b.dataset.ty));setTy(ty);
   const check=()=>{parsed=parseYT(fu.value);
     if(!fu.value.trim()){det.innerHTML='<span class="muted">بانتظار الرابط…</span>';return}
     if(!parsed){det.innerHTML='<span class="bad">الرابط غير معروف. من يوتيوب: مشاركة ← نسخ الرابط.</span>';return}
@@ -1532,18 +1562,20 @@ function openEditor(id,pre='',secPre){
     det.innerHTML=`<div class="pv">${img(parsed.vid,'mqdefault',false)}</div><div><div class="ok" style="font-weight:600">لگيت المقطع</div>${parsed.start?`<div class="muted">يبدأ من ${fmtT(parsed.start)}</div>`:''}${dup?`<div style="color:var(--warn)">موجود مسبقاً: ${esc(dup.title)}</div>`:''}</div>`};
   fu.oninput=check;check();
   $('#fSec').onchange=e=>{$('#nsF').hidden=e.target.value!=='__new';if(e.target.value==='__new')$('#fNS').focus()};
-  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#mOne').style.display=mode==='one'?'flex':'none';$('#mBulk').hidden=mode!=='bulk'});
+  document.querySelectorAll('#layer [data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('#layer [data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#mOne').style.display=mode==='one'?'flex':'none';$('#mBulk').hidden=mode!=='bulk'});
   const fb=$('#fBulk');if(fb)fb.oninput=()=>{const ls=fb.value.split(/\s+/).filter(Boolean);$('#bInfo').textContent=ls.length?`لگيت ${ls.filter(parseYT).length} من ${ls.length}`:''};
   $('#fSave').onclick=()=>{
     let sec=$('#fSec').value;
-    if(sec==='__new'){const n=$('#fNS').value.trim();if(!n){toast('اكتب اسم القسم');return}const s={id:uid(),name:n,color:S.settings.accent};S.sections.push(s);sec=s.id}
+    const kind={vid:'video',mus:'music',both:'both'}[ty]||'video';
+    if(ty==='mus')sec='';
+    else if(sec==='__new'){const n=$('#fNS').value.trim();if(!n){toast('اكتب اسم القسم');return}const s={id:uid(),name:n,color:S.settings.accent};S.sections.push(s);sec=s.id}
     if(mode==='bulk'){const items=$('#fBulk').value.split(/\s+/).map(parseYT).filter(Boolean);if(!items.length){toast('ما لگيت روابط صحيحة');return}
-      closeLayer(true);items.forEach(p=>{const nv={id:uid(),vid:p.vid,title:'دا يجيب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`انضاف ${items.length} مقطع`);return}
+      closeLayer(true);items.forEach(p=>{const nv={id:uid(),kind,vid:p.vid,title:'دا يجيب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`انضاف ${items.length} مقطع`);return}
     if(!parsed){toast('الرابط غير صحيح');fu.focus();return}
     const title=$('#fTitle').value.trim(),note=$('#fNote').value.trim();
     closeLayer(true);
-    if(v){const vidChanged=v.vid!==parsed.vid;Object.assign(v,{vid:parsed.vid,start:parsed.start,title:title||v.title,note,section:sec,ex:false});save();toast('تم الحفظ');if(isPR(location.hash.slice(1))&&location.hash.slice(3)===v.id){if(vidChanged){stopPlayer();renderWatch(v.id)}else{const t=$('.wtitle');if(t)t.textContent=v.title;const n=$('#wNote');if(n)n.value=v.note}}else rerender()}
-    else addVideo(parsed,sec,title,note);
+    if(v){const vidChanged=v.vid!==parsed.vid;Object.assign(v,{vid:parsed.vid,start:parsed.start,title:title||v.title,note,section:sec,kind,ex:false});save();toast('تم الحفظ');if(isPR(location.hash.slice(1))&&location.hash.slice(3)===v.id){if(vidChanged){stopPlayer();renderWatch(v.id)}else{const t=$('.wtitle');if(t)t.textContent=v.title;const n=$('#wNote');if(n)n.value=v.note}}else rerender()}
+    else addVideo(parsed,sec,title,note,kind);
   };
   $('#layer').querySelectorAll('input.in').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#fSave').click()}}));
 }
@@ -1551,7 +1583,7 @@ function openEditor(id,pre='',secPre){
 /* ================= sections ================= */
 function openSections(){
   if(!editable())return;
-  const rows=()=>S.sections.map((s,i)=>`<div class="secrow" data-sid="${s.id}"><input type="color" value="${s.color}" data-scol aria-label="لون"><input class="in" value="${esc(s.name)}" data-sname aria-label="اسم القسم">
+  const rows=()=>S.sections.map((s,i)=>s.music?'':`<div class="secrow" data-sid="${s.id}"><input type="color" value="${s.color}" data-scol aria-label="لون"><input class="in" value="${esc(s.name)}" data-sname aria-label="اسم القسم">
    <button class="xb" data-up="${i}" aria-label="رفع" ${i===0?'disabled':''}>↑</button><button class="xb" data-sdel="${s.id}" aria-label="حذف">${sv('trash',15)}</button></div>`).join('')||'<div class="muted">ماكو أقسام بعد</div>';
   openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>إدارة الأقسام</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
    <div class="pb"><div id="sl" style="display:flex;flex-direction:column;gap:8px">${rows()}</div>
@@ -1656,7 +1688,7 @@ function applyShared(d){S.sections=d.sections||[];S.videos=(d.videos||[]).map(v=
 function setCloud(state,msg){cloud.state=state;cloud.msg=msg;const d=$('#cloudDot');if(d){d.className='cloud '+state;$('#cloudTxt').textContent=state==='on'?'متصل':state==='err'?'خطأ بالاتصال':'محلي';d.title=msg}const cs=$('#cStat');if(cs){cs.className='status '+state;$('#cMsg').textContent=msg}}
 const loadScript=src=>new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.append(s)});
 function keepCur(L){if(!cur)return;const i=L.videos.findIndex(x=>x.id===cur.id);if(i<0)return;const n=L.videos[i];const pos=Math.max(n.pos||0,cur.pos||0);Object.assign(cur,n,{pos});L.videos[i]=cur}
-function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
+function stripV(v){const o={};['id','vid','title','section','note','start','added','dur','ex','kind'].forEach(k=>{if(v[k]!==undefined)o[k]=v[k]});return o}
 function applyPub(d){const old=new Map(S.pub.videos.map(v=>[v.id,v]));S.pub.sections=d.sections||[];
   S.pub.videos=(d.videos||[]).map(v=>{const o=old.get(v.id)||{};const r={marks:[],pos:0,plays:0,fav:false,watched:false,last:0,...v};PF.forEach(k=>{if(o[k]!==undefined)r[k]=o[k]});r.dur=Math.max(v.dur||0,o.dur||0);return r});
   fixLib(S.pub);keepCur(S.pub)}
@@ -1720,7 +1752,7 @@ function setSrc(v,silent){if(S.src===v)return;S.src=v;saveLocal();libF='all';hom
 document.addEventListener('click',e=>{const b=e.target.closest('[data-src]');if(b)setSrc(b.dataset.src)});
 
 /* ================= OUR OWN PLAYER CONTROLS (YouTube controls are switched off) ================= */
-const PCTL=`<div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-fb" id="pcFb"></div><button class="pc-ad" id="pcAd" type="button"></button><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn" id="pcTouch" aria-label="لمس المقطع مباشرة (للإعلانات)" title="لمس مباشر (إذا طلع إعلان)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></button><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div>`;
+const PCTL=`<div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-cover" id="pcCover" aria-hidden="true"><div class="cvbg"></div><div class="disc"><span></span></div><div class="cveq"><i></i><i></i><i></i><i></i><i></i></div></div><div class="pc-fb" id="pcFb"></div><button class="pc-ad" id="pcAd" type="button"></button><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn" id="pcTouch" aria-label="لمس المقطع مباشرة (للإعلانات)" title="لمس مباشر (إذا طلع إعلان)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg></button><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div>`;
 const IC_VOL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
 const IC_MUTE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg>';
 const IC_FS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
@@ -1729,6 +1761,7 @@ const PC={hideT:null,seeking:false,st:-1,lastTap:0};
 /* ads: YouTube ads can't be controlled through the API, so when one plays we get out of the way
    (show YouTube's own layer and let taps through) so the "Skip" button works */
 const AD={on:false,manual:false,lastT:-1,lastAdv:0,mt:0,mT:null};
+function setCover(){const c=document.getElementById('pcCover');if(c&&cur)c.style.setProperty('--cv',`url("https://i.ytimg.com/vi/${cur.vid}/hqdefault.jpg")`)}
 function setAd(on,manual){
   AD.on=on;AD.manual=!!(on&&manual);clearTimeout(AD.mT);
   const pv=document.getElementById('pv');if(pv)pv.classList.toggle('ad',on);document.body.classList.toggle('ad-on',on&&!AD.manual);
@@ -1773,7 +1806,7 @@ const pBox=$('#player');
 pBox.addEventListener('click',e=>{
   if(Date.now()-(PC.swiped||0)<450)return;
   const b=e.target.closest('button,#pcHit');if(!b)return;
-  if(b.closest('.pv.mini')&&b.id==='pcHit'){if(AD.on){if(PV.id)goV(PV.id)}else pcToggle();return}
+  if(b.closest('.pv.mini')&&b.id==='pcHit'){if(AD.on){if(PV.id)goV(PV.id,PV.kind==='music'?'m':'w')}else pcToggle();return}
   switch(b.id){
     case 'pcHit':{const now=Date.now(),r=b.getBoundingClientRect(),x=e.clientX-r.left;
       if(now-PC.lastTap<300){PC.lastTap=0;pcSeekBy(x<r.width/2?-10:10);return}PC.lastTap=now;
@@ -1807,7 +1840,7 @@ pcSpeedLbl();pcMuteLbl();pcFsLbl();pcState(-1);
   const end=()=>{if(!sw)return;const s2=sw;sw=null;if(!s2.on)return;PC.swiped=Date.now();pv.classList.remove('dragging');pv.classList.add('snap');
     if(s2.mode==='full'&&s2.dy>90){pv.style.transform='';pv.style.opacity='';pv.classList.remove('snap');go('home');return}
     if(s2.mode==='mini'&&s2.dy>55){pv.style.transform='translateY(140%)';pv.style.opacity='0';setTimeout(()=>{stopPlayer();pv.style.transform='';pv.style.opacity='';pv.classList.remove('snap')},260);return}
-    if(s2.mode==='mini'&&s2.dy<-40){pv.style.transform='';pv.style.opacity='';pv.classList.remove('snap');if(PV.id)goV(PV.id);return}
+    if(s2.mode==='mini'&&s2.dy<-40){pv.style.transform='';pv.style.opacity='';pv.classList.remove('snap');if(PV.id)goV(PV.id,PV.kind==='music'?'m':'w');return}
     pv.style.transform='';pv.style.opacity='';setTimeout(()=>pv.classList.remove('snap'),320)};
   pv.addEventListener('touchend',end);pv.addEventListener('touchcancel',end);
 })();
@@ -1867,7 +1900,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.menu){e.stopPropagation();openMenu(t,id);return}
   if(t.dataset.mv){e.stopPropagation();moveMenu(t,id);return}
   closeMenu();
-  if(t.dataset.play){const ctx=t.closest('.row,.grid');if(ctx){const ids=[...ctx.querySelectorAll('.vc')].map(c=>c.dataset.id);const h=ctx.closest('section,.view')?.querySelector('h1,h2');playCtx(id,ids,h?[...h.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():'')}else goV(id);return}
+  if(t.dataset.play){const ctx=t.closest('.row,.grid');if(ctx){const ids=[...ctx.querySelectorAll('.vc')].map(c=>c.dataset.id);const h=ctx.closest('section,.view')?.querySelector('.sh h2,.lhead h1');playCtx(id,ids,h?[...h.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():'')}else goV(id);return}
   if(t.dataset.fav){v.fav=!v.fav;save();rerender();toast(v.fav?'انضاف للمفضلة':'انشال من المفضلة');return}
   if(t.dataset.watch){v.watched=!v.watched;if(v.watched)v.pos=0;save();rerender();return}
   if(t.dataset.copy){copy(ytUrl(v),'انتسخ الرابط');return}
@@ -1897,7 +1930,7 @@ document.addEventListener('paste',e=>{
   if(parseYT(t)&&!$('#layer').innerHTML&&editable()){e.preventDefault();openEditor(null,t.trim())}
 });
 addEventListener('pagehide',()=>{if(yt&&cur){try{cur.pos=yt.getCurrentTime()}catch(e){}saveLocal()}});
-$('#bAdd').onclick=()=>openEditor(null,'',route==='music'?S.sections.find(x=>x.music)?.id:undefined);$('#dAdd').onclick=()=>editable()?openEditor(null,'',route==='music'?S.sections.find(x=>x.music)?.id:undefined):openPalette();
+const addKind=()=>route==='music'||route.startsWith('m-')?'music':undefined;$('#bAdd').onclick=()=>openEditor(null,'',undefined,addKind());$('#dAdd').onclick=()=>editable()?openEditor(null,'',undefined,addKind()):openPalette();
 $('#bSearch').onclick=openPalette;
 $('#bSet').onclick=openSettings;$('#dSet').onclick=openSettings;
 
