@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-16">
+<meta name="app-build" content="2026.11.05-17">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -20,7 +20,7 @@
 <title>علي فيجن</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Orbitron:wght@800&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: glass top bar + mobile dock · cinematic hero carousel · quick-add strip · section tiles · horizontal shelves · library grid · watch stage with ambilight + up-next rail. Dark-first, own light mode via [data-mode]. */
 :root{
@@ -1261,6 +1261,28 @@ html.lite .sslide .sc>*{opacity:1!important;transform:none!important}
   .toasts{z-index:140}
 }
 html.lite .dock{background:var(--bg)!important}
+
+/* ===== v17: lighter on phones + music search ===== */
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.view.enter>*:nth-child(n+7){animation:none!important}
+@media (hover:none),(max-width:900px){
+  .ytchips{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--bg)!important}
+  #warp::after{display:none}
+  .orb .op{filter:none!important}
+  .dk2 .dkbg{filter:blur(40px) saturate(1.5)!important;opacity:.3}
+  .dk2::before{display:none}
+  .spot{box-shadow:0 18px 40px -30px rgba(var(--acc-rgb),.7)!important}
+  .tl{box-shadow:none!important}
+  .view.enter .lhead h1,.view.enter .wtitle{animation:none!important}
+}
+.msearch{margin-top:14px;display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-radius:16px;background:var(--card);border:1px solid var(--line2)}
+.msearch svg{width:18px;height:18px;color:var(--dim);flex:none}
+.msearch input{flex:1;min-width:0;border:0;background:none;color:var(--fg);font:500 15.5px var(--f-ar);outline:none}
+.msearch input::-webkit-search-cancel-button{-webkit-appearance:none}
+.msearch:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.16)}
+.msearch .num{font-size:12px;color:var(--dim);white-space:nowrap}
+.trk[hidden]{display:none!important}
+.msearch input:focus-visible{outline:none!important}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1402,7 +1424,9 @@ if(!S.settings.amStyle){S.settings.amStyle=1;S.settings.bg='pattern';S.settings.
 let LITE=0;try{LITE=+localStorage.getItem('av-boot')||0;localStorage.setItem('av-boot',String(LITE+1))}catch(e){}
 const bootOk=()=>{try{localStorage.setItem('av-boot','0')}catch(e){}};setTimeout(bootOk,8000);addEventListener('pagehide',bootOk);document.addEventListener('visibilitychange',()=>{if(document.hidden)bootOk()});
 if(LITE)document.documentElement.classList.add('lite');
-const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let SLT=null;const saveNow=()=>{clearTimeout(SLT);SLT=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const saveLocal=()=>{if(!SLT)SLT=setTimeout(saveNow,600)};
+addEventListener('pagehide',saveNow);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveNow()});
 const save=()=>{saveLocal();cloudPush()};
 const editable=()=>S.src==='pub'?!!(typeof AUTH!=='undefined'&&AUTH.admin):true;
 
@@ -1695,21 +1719,25 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-pnext]');i
 function toggleKind(v){const o=['video','music','both'];v.kind=o[(o.indexOf(v.kind||'video')+1)%3];save();rerender();toast('صار يظهر بـ: '+KL[v.kind])}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tomus]');if(!b)return;closeMenu();const v=S.videos.find(x=>x.id===b.dataset.tomus);if(v&&editable())toggleKind(v)});
 function musicList(){return S.videos.filter(isMusic).sort((a,b)=>b.added-a.added)}
-function trk(v,i){const now=cur&&cur.id===v.id;return`<div class="trk ${now?'now':''}" role="button" tabindex="0" data-mplay="${v.id}"><span class="n">${now?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="cv">${img(v.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(v.title)}</b><small class="num">${v.list?'ميكس · ':''}${v.plays} تشغيل${v.fav?' · بالمفضلة':''}</small></span><span class="d">${v.dur?fmtT(v.dur):''}</span><button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>`}
+function trk(v,i){const now=cur&&cur.id===v.id;return`<div class="trk ${now?'now':''}" role="button" tabindex="0" data-mplay="${v.id}" data-q="${esc(norm(v.title+' '+v.note))}"><span class="n">${now?'<span class="eq"><i></i><i></i><i></i></span>':i+1}</span><span class="cv">${img(v.vid,'mqdefault',false)}</span><span class="tx"><b>${esc(v.title)}</b><small class="num">${v.list?'ميكس · ':''}${v.plays} تشغيل${v.fav?' · بالمفضلة':''}</small></span><span class="d">${v.dur?fmtT(v.dur):''}</span><button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>`}
 function renderMusic(){
   const L=musicList(),tot=L.reduce((a,v)=>a+(v.dur||0),0);
   $('#app').innerHTML=`<div class="view">
    <div class="mhead"><div class="mt"><small>MUSIC ── ALI-VISION</small><h1>الموسيقى</h1><p><span class="num">${L.length}</span> أغنية${tot?` · <span class="num">${fmtT(tot)}</span>`:''}</p></div>
     <div class="ma">${L.length?`<button class="btn pri" id="mPlay">${I.play}تشغيل الكل</button><button class="btn" id="mShuf">${sv('shuffle',16)}عشوائي</button>`:''}${editable()?`<button class="btn" id="mAdd">${sv('plus',16)}إضافة أغنية</button>`:''}</div>
     <div class="bars eqb" aria-hidden="true">${'<i></i>'.repeat(16)}</div></div>
-   <div class="tracks">${L.length?L.map(trk).join(''):emptyBox('ماكو موسيقى بعد',editable()?'دوس «إضافة أغنية» وحط رابطها، تنحفظ بقسم الموسيقى.':'تنضاف أغاني قريباً.')}</div>
+   ${L.length>3?`<label class="msearch">${I.search}<input id="mQ" type="search" placeholder="دوّر بالأغاني…" autocomplete="off" enterkeyhint="search"><span class="num" id="mQn"></span></label>`:''}
+   <div class="tracks" id="mTracks">${L.length?L.map(trk).join(''):emptyBox('ماكو موسيقى بعد',editable()?'دوس «إضافة أغنية» وحط رابطها، تنحفظ بقسم الموسيقى.':'تنضاف أغاني قريباً.')}</div>
    <p class="foot">تصميم وبرمجة <b>علي مالك</b></p></div>`;
   const ids=L.map(v=>v.id);
   const mp=$('#mPlay');if(mp)mp.onclick=()=>{MU.shuf=false;playCtx(ids[0],ids,'الموسيقى','m')};
   const mh=$('#mShuf');if(mh)mh.onclick=()=>{MU.shuf=true;const a=ids.slice().sort(()=>Math.random()-.5);playCtx(a[0],a,'الموسيقى · عشوائي','m')};
+  const mq=$('#mQ');if(mq){mq.oninput=()=>{const w=norm(mq.value).split(' ').filter(Boolean);let n=0;
+    document.querySelectorAll('#mTracks .trk').forEach(r=>{const ok=w.every(x=>r.dataset.q.includes(x));r.hidden=!ok;if(ok)n++});
+    $('#mQn').textContent=w.length?n+' نتيجة':'';let e=$('#mNone');if(!n&&w.length){if(!e)$('#mTracks').insertAdjacentHTML('beforeend','<div class="muted" id="mNone" style="padding:24px;text-align:center">ماكو أغنية بهالاسم</div>')}else if(e)e.remove()}}
   const ma=$('#mAdd');if(ma)ma.onclick=()=>openEditor(null,'',undefined,'music');
 }
-document.addEventListener('click',e=>{const m=e.target.closest('[data-mplay]');if(!m||e.target.closest('[data-menu]'))return;const ids=musicList().map(v=>v.id);if(!MU.shuf||!Q.ids.includes(m.dataset.mplay))playCtx(m.dataset.mplay,ids,'الموسيقى','m');else goV(m.dataset.mplay,'m')});
+document.addEventListener('click',e=>{const m=e.target.closest('[data-mplay]');if(!m||e.target.closest('[data-menu]'))return;const vis=[...document.querySelectorAll('#mTracks .trk:not([hidden])')].map(r=>r.dataset.mplay);const ids=vis.length?vis:musicList().map(v=>v.id);if(!MU.shuf||!Q.ids.includes(m.dataset.mplay))playCtx(m.dataset.mplay,ids,'الموسيقى','m');else goV(m.dataset.mplay,'m')});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-mplay]'))e.target.click()});
 function renderMusicPlayer(id){
   const v=findV(id);if(!v){go('music');return}
@@ -1738,6 +1766,7 @@ function renderMusicPlayer(id){
      <div class="row"><span class="lb">VOL</span><div class="vol">${IOS?`<button id="muMute" aria-label="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button><span class="ios">مستوى الصوت من أزرار الآيفون</span>`:`<button id="muMute" aria-label="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button><input type="range" id="muVol" min="0" max="100" value="${vol}" style="--p:${vol}%" aria-label="مستوى الصوت"><span class="pc num" id="muVolT">${vol}</span>`}</div></div>
      <div class="row"><span class="lb">MODE</span><div class="modes" id="muModes" style="flex:1">${Object.entries(MODES).map(([k,m])=>`<button data-mm="${k}" class="${S.settings.mmode===k?'on':''}"><b>${m.l}</b><small>${m.d}</small></button>`).join('')}</div></div>
      <div class="sx">
+      <button id="muAd" title="إذا طلع إعلان وما تگدر تتخطاه"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a1.5 1.5 0 0 1 3 0v5M12 10V4a1.5 1.5 0 0 1 3 0v6M15 10V6a1.5 1.5 0 0 1 3 0v7a7 7 0 0 1-7 7h-.5a6 6 0 0 1-5-2.7L3.7 14a1.5 1.5 0 0 1 2.4-1.8L9 15V11"/></svg><span>إعلان؟ تخطّاه</span></button>
       <button id="muSleep" class="${MU.sleep?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><span>${sleepLbl()}</span></button>
       ${IOS?'':`<button id="muFade" class="${S.settings.fade?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2"/></svg><span>انتقال ناعم</span></button>`}
       <button id="wFav" class="${v.fav?'on':''}">${v.fav?I.heartF:I.heart}<span>${v.fav?'بالمفضلة':'مفضلة'}</span></button>
@@ -1761,6 +1790,7 @@ function renderMusicPlayer(id){
   const mv=$('#muVol');if(mv)mv.oninput=()=>{S.settings.vol=+mv.value;mv.style.setProperty('--p',mv.value+'%');$('#muVolT').textContent=mv.value;saveLocal();try{if(yt.isMuted())yt.unMute();yt.setVolume(curVol())}catch(e){}};
   $('#muMute').onclick=()=>{try{yt.isMuted()?yt.unMute():yt.mute();setTimeout(()=>{const m=yt.isMuted();$('#muMute').style.color=m?'var(--accent)':'';toast(m?'انكتم الصوت':'رجع الصوت')},60)}catch(e){}};
   $('#muModes').onclick=e=>{const b=e.target.closest('[data-mm]');if(!b)return;S.settings.mmode=b.dataset.mm;saveLocal();applyAudio();$('#muModes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));const m=MODES[b.dataset.mm];toast(m.l+' · '+m.d+(IOS&&m.vol?' (الصوت الواطي من أزرار الآيفون)':''))};
+  $('#muAd').onclick=()=>{setAd(true,true);toast('دوس «تخطي» على الإعلان بالدائرة');scrollTo({top:0,behavior:'smooth'})};
   $('#muSleep').onclick=()=>{const i=SLEEP.indexOf(MU.sleep);setSleep(SLEEP[(i+1)%SLEEP.length]);toast(sleepLbl())};
   const mf=$('#muFade');if(mf)mf.onclick=()=>{S.settings.fade=!S.settings.fade;saveLocal();mf.classList.toggle('on',S.settings.fade);toast(S.settings.fade?'انتقال ناعم شغّال':'انتقال ناعم مطفي')};
   $('#wFav').onclick=()=>{v.fav=!v.fav;save();const b=$('#wFav');b.classList.toggle('on',v.fav);b.innerHTML=(v.fav?I.heartF:I.heart)+`<span>${v.fav?'بالمفضلة':'مفضلة'}</span>`};
@@ -1990,7 +2020,7 @@ function openPalette(){
     {t:'تشغيل عشوائي',ic:'shuffle',run:()=>{const a=S.videos.map(v=>v.id).sort(()=>Math.random()-.5);if(a.length)playCtx(a[0],a,'تشغيل عشوائي')}}];
   const draw=()=>{
     const q=$('#pq').value.trim().toLowerCase();
-    const vids=S.videos.filter(v=>!q||hit(v,q)).sort((a,b)=>(b.last||0)-(a.last||0)).slice(0,24).map(v=>({g:'المقاطع',t:v.title,s:(secOf(v.section)?.name||'بدون قسم')+(v.dur?' · '+fmtT(v.dur):''),vid:v.vid,run:()=>goV(v.id)}));
+    const vids=S.videos.filter(v=>!q||hit(v,q)).sort((a,b)=>(b.last||0)-(a.last||0)).slice(0,24).map(v=>({g:v.kind==='music'?'الموسيقى':'المقاطع',t:v.title,s:(secOf(v.section)?.name||'بدون قسم')+(v.dur?' · '+fmtT(v.dur):''),vid:v.vid,run:()=>goV(v.id,v.kind==='music'||((route==='music'||route.startsWith('m-'))&&isMusic(v))?'m':'w')}));
     const secs=S.sections.filter(s=>q&&s.name.toLowerCase().includes(q)).map(s=>({g:'الأقسام',t:s.name,s:S.videos.filter(v=>v.section===s.id).length+' مقطع',dot:s.color,run:()=>{libF=s.id;go('library')}}));
     const cs=cmds.filter(c=>!q||c.t.includes(q)).map(c=>({...c,g:'أوامر'}));
     items=[...secs,...vids,...cs];sel=Math.max(0,Math.min(sel,items.length-1));let g='';
@@ -2244,11 +2274,13 @@ function pcFull(){
 }
 document.addEventListener('fullscreenchange',()=>{pcFsLbl();pvFollow(300)});
 setInterval(()=>{
-  if(!yt||!yt.getCurrentTime)return;const c=pcEl('pctl');if(!c)return;
+  if(!yt||!yt.getCurrentTime||document.hidden)return;const c=pcEl('pctl');if(!c)return;
   let t=0,d=0,b=0;try{t=yt.getCurrentTime()||0;d=yt.getDuration()||0;b=yt.getVideoLoadedFraction?yt.getVideoLoadedFraction():0}catch(e){return}
   {const now=Date.now();let st=-1;try{st=yt.getPlayerState()}catch(e){}
    if(Math.abs(t-AD.lastT)>.04)AD.lastAdv=now;AD.lastT=t;
-   const frozen=st===1&&now-AD.lastAdv>1600, stuck=(st===-1||st===5)&&AD.mt&&now-AD.mt>6000&&now-AD.lastAdv>6000;
+   let other=false;if(cur&&!cur.list&&(st===1||st===3)){try{const vd=yt.getVideoData&&yt.getVideoData();other=!!(vd&&vd.video_id&&vd.video_id!==cur.vid)}catch(e){}}
+   const frozen=(st===1||st===3)&&now-AD.lastAdv>2200&&now-AD.mt>1500, stuck=(st===-1||st===5)&&AD.mt&&now-AD.mt>5000&&now-AD.lastAdv>5000;
+   if(!AD.on&&other)setAd(true);
    if(!AD.on&&(frozen||stuck))setAd(true);
    else if(AD.on&&!AD.manual&&st===1&&now-AD.lastAdv<400)setAd(false);
    if(!AD.on&&st===1&&cur&&!cur.list&&d>1&&now-AD.lastAdv<400&&Math.abs((cur.dur||0)-d)>2)cur.dur=Math.round(d)}
@@ -2399,6 +2431,7 @@ $('#bSet').onclick=openSettings;$('#dSet').onclick=openSettings;
 const cv=$('#fx'),cx=cv.getContext('2d');let W,H,parts=[],tick=0,raf;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function bgReset(){
+  if(S.settings.bg!=='grid'&&S.settings.bg!=='stars'){cv.width=cv.height=0;cv.style.display='none';cancelAnimationFrame(raf);return}cv.style.display='';
   const dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
   parts=[];if(S.settings.bg==='stars')for(let i=0;i<150;i++)parts.push({x:Math.random()*W,y:Math.random()*H,z:Math.random()+.2});
   cancelAnimationFrame(raf);frame();
@@ -2453,12 +2486,12 @@ window.__av={playing:()=>{try{return!!yt&&yt.getPlayerState()===1}catch(e){retur
   async function check(){
     if(busy)return;busy=true;
     try{
-      const r=await fetch(location.pathname+'?_c='+Date.now(),{cache:'no-store'});
-      if(r.ok){const t=await r.text();const m=t.match(/name="app-build" content="([^"]+)"/);
+      const r=await fetch(location.pathname+'?_c='+Date.now(),{cache:'no-store',headers:{Range:'bytes=0-4095'}});
+      if(r.ok){let t='';try{const rd=r.body.getReader();const {value}=await rd.read();t=new TextDecoder().decode(value||new Uint8Array());rd.cancel().catch(()=>{})}catch(_){t=await r.text()}const m=t.match(/name="app-build" content="([^"]+)"/);
         if(m&&mine&&m[1]!==mine)reload(m[1]);}
     }catch(e){}busy=false;
   }
-  setInterval(()=>{if(pending&&!playing())reload(pending);else check()},60000);
+  setInterval(()=>{if(pending&&!playing())reload(pending);else check()},300000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(pending&&!playing())reload(pending);else check()}});
   window.addEventListener('pageshow',e=>{if(e.persisted)check()});
   window.addEventListener('focus',check);
