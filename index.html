@@ -2,14 +2,19 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="علي فيجن">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
 <title>علي فيجن</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=Chakra+Petch:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap">
 <style>
 /* Layout: glass top bar + mobile dock · cinematic hero carousel · quick-add strip · section tiles · horizontal shelves · library grid · watch stage with ambilight + up-next rail. Dark-first, own light mode via [data-mode]. */
 :root{
@@ -400,14 +405,240 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .foot b{color:var(--dim)}
 :root[data-motion="off"] *,:root[data-motion="off"] *::before,:root[data-motion="off"] *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* =====================================================================
+   ALI MALIK STYLE LAYER — calm sci-fi HUD (same family as AM NET / Dazzaz)
+   ===================================================================== */
+:root{
+  --bg:#0b0c10;--bg2:#0f1015;--card:#121319;--card2:#1a1c24;--line:rgba(255,255,255,.065);--line2:rgba(255,255,255,.11);
+  --fg:#eceef2;--dim:#99a0ab;--mute:#5d636e;--glass:rgba(11,12,16,.86);--ok:#3ccf82;--warn:#f2b03d;
+  --r:14px;--rs:10px;--acc-rgb:227,23,43;--side:262px;--bnav:66px;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --f-ar:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  --f-display:"Cairo","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-tech:"Orbitron","JetBrains Mono",ui-monospace,monospace;
+  --f-hud:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+:root[data-mode="light"]{--bg:#f3f4f7;--bg2:#eceef2;--card:#ffffff;--card2:#f6f7f9;--line:rgba(16,22,34,.08);--line2:rgba(16,22,34,.14);
+  --fg:#161a22;--dim:#5b6270;--mute:#959ba6;--glass:rgba(255,255,255,.88);--ok:#17925a;--warn:#b4760f}
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+a,button,input,select,label{-webkit-tap-highlight-color:transparent}
+body{line-height:1.65;-webkit-font-smoothing:antialiased;padding-block:0 120px;
+  background-image:radial-gradient(1000px 520px at 75% -20%,rgba(var(--acc-rgb),.07),transparent 60%),var(--bgpat,none);background-size:auto,160px 160px;background-attachment:fixed}
+body::before{height:var(--sat);background:var(--bg)}
+h1,h2,h3,h4,.brand b,.tile b,.wtitle{font-family:var(--f-display)}
+.hud{font-family:var(--f-tech);letter-spacing:.12em}
+.grp h5,.pgrp{font-family:var(--f-ar)!important;letter-spacing:.02em!important;font-weight:700}
+.tile .cnt{font-family:var(--f-ar)!important}
+.chip .n,.qit .n,.sclock b{font-family:var(--f-hud)}
+.aurora{opacity:calc(.2 + var(--glow)*.4)}
+
+/* logo */
+.logo{width:44px;height:44px;background:none!important;box-shadow:none!important;border-radius:0!important;clip-path:none!important;overflow:visible}
+.logo::after{display:none}
+.logo svg{width:44px!important;height:44px!important;margin:0!important;filter:drop-shadow(0 0 8px rgba(var(--acc-rgb),.35))}
+.brand b{font-weight:800;font-size:18px}
+.brand small{font-family:var(--f-tech);letter-spacing:.3em;font-size:9px}
+
+/* eyebrow */
+.eyebrow{font-family:var(--f-tech);font-size:9.5px;letter-spacing:2px;color:var(--accent);direction:ltr;display:flex;gap:10px;align-items:center;justify-content:flex-end;opacity:.8;margin-bottom:2px}
+.eyebrow::before{content:"";width:20px;height:1px;background:var(--line2);order:2}
+.eyebrow b{order:3;color:var(--dim);font-weight:600}
+.eyebrow span{order:1}
+
+/* HUD corner brackets on panels */
+.box,.wside,.qadd,.lhead,.ctrl{--hc:rgba(var(--acc-rgb),.55);background-image:
+  linear-gradient(var(--hc),var(--hc)),linear-gradient(var(--hc),var(--hc)),linear-gradient(var(--hc),var(--hc)),linear-gradient(var(--hc),var(--hc));
+  background-repeat:no-repeat;background-size:12px 1.5px,1.5px 12px,12px 1.5px,1.5px 12px;background-position:left top,left top,right bottom,right bottom}
+.lhead{padding:16px 18px;border:1px solid var(--line);border-radius:var(--r);background-color:var(--card)}
+.box,.wside,.qadd,.ctrl{background-color:var(--card)}
+
+/* buttons, inputs, chips */
+.btn{border-radius:var(--rs);font-weight:600}
+.btn.sm{border-radius:8px}
+.btn.pri{box-shadow:0 8px 22px -12px rgba(var(--acc-rgb),.7)}
+.sbox,.sel,.seg,.qadd select{border-radius:var(--rs)}
+.seg button{border-radius:8px}
+.in{border-radius:var(--rs)}
+.in:focus,.sbox:focus-visible{box-shadow:0 0 0 3px rgba(var(--acc-rgb),.16)}
+.chip{border-radius:999px;background:transparent}
+.chip.on{background:rgba(var(--acc-rgb),.14);color:var(--fg);border-color:rgba(var(--acc-rgb),.6)}
+.chip.on .d{background:var(--accent)!important}
+.qadd{border-radius:var(--r)}
+.qadd::before{opacity:.6}
+.panel{border-radius:18px}
+.toast{border-radius:12px;border-color:rgba(var(--acc-rgb),.45)}
+
+/* section heads */
+.sh h2{font-size:19px;font-weight:800}
+.sh h2 .dot{width:9px;height:9px;border-radius:2px}
+.lhead h1{font-size:clamp(22px,2.6vw,28px);font-weight:800}
+.wtitle{font-weight:800}
+
+/* video cards: calmer hover */
+.vt{border-radius:var(--r)}
+.vc:hover .vt{box-shadow:0 0 0 1.5px rgba(var(--acc-rgb),.8),0 14px 34px -18px rgba(var(--acc-rgb),.6)}
+.tile{border-radius:var(--r)}
+
+/* ---------- toasts at the top ---------- */
+.toasts{top:calc(var(--sat) + 12px);bottom:auto!important}
+.toast{animation:toastIn .22s ease-out}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}}
+
+/* ---------- desktop: right sidebar ---------- */
+.navlbl,.sclock,.scredit{display:none}
+@media (min-width:901px){
+  body{padding-right:var(--side)}
+  .top{position:fixed;top:0;bottom:0;right:0;width:var(--side);height:100vh;border-bottom:0;border-left:1px solid var(--line);background:color-mix(in srgb,var(--card) 92%,transparent);padding:max(20px,var(--sat)) 16px max(16px,var(--sab));overflow:auto}
+  .top-in{flex-direction:column;align-items:stretch;height:auto;min-height:100%;gap:14px;max-width:none}
+  .brand{order:0}
+  .top .addb{order:1;height:50px;border-radius:0;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));font-size:15.5px;font-weight:700;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 80%,#fff),var(--accent));box-shadow:none}
+  .top .addb .t{display:inline!important}
+  .sbox{order:2;flex:none!important;max-width:none;margin:0;border-radius:var(--rs);height:44px}
+  .navlbl{order:3;display:block;font-size:11.5px;color:var(--mute);padding-inline:8px;margin-top:4px}
+  .nav{order:4;flex-direction:column;gap:2px;margin:0}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--rs);font-weight:600;font-size:14.5px;position:relative}
+  .nav a svg{width:19px;height:19px;flex:none}
+  .nav a .ix{margin-inline-start:auto;font-family:var(--f-hud);font-size:11px;color:var(--mute);opacity:.7}
+  .nav a.on{background:rgba(var(--acc-rgb),.12);color:var(--fg)}
+  .nav a.on::before{content:"";position:absolute;inset-inline-start:-16px;top:7px;bottom:7px;width:3px;border-radius:3px;background:var(--accent);animation:sideBar .45s cubic-bezier(.2,.8,.2,1)}
+  .nav a.on .ix{color:var(--accent);opacity:1}
+  .sclock{order:6;margin-top:auto;display:flex;align-items:baseline;justify-content:space-between;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:var(--rs);padding:12px 14px}
+  .sclock b{font-size:21px;font-weight:700}
+  .sclock span{font-family:var(--f-hud);font-size:10px;color:var(--dim);letter-spacing:1px;direction:ltr}
+  .top .cloud{order:7;padding-inline:4px}
+  .top .cloud .t{display:inline!important}
+  .top .setb{order:8;width:100%;border-radius:var(--rs)}
+  .top .setb::after{content:"الإعدادات";font-size:14px}
+  .scredit{order:9;display:block;font-size:12px;color:var(--mute);text-align:center}
+  .scredit b{color:var(--dim)}
+  .sbox .kbd{display:inline!important}
+  .wrap{max-width:1240px}
+  .wside{top:16px;max-height:calc(100vh - 32px)}
+  .drawer{z-index:95}
+}
+@keyframes sideBar{from{transform:scaleY(0)}}
+
+/* ---------- phone: top bar + bottom nav with raised diamond ---------- */
+@media (max-width:900px){
+  .top{top:0;padding-top:var(--sat)}
+  .top-in{height:60px;gap:10px}
+  .nav,.top .addb{display:none!important}
+  .sbox{display:flex!important;flex:none;width:42px;height:42px;padding:0;justify-content:center;margin-inline-start:auto;border-radius:var(--rs)}
+  .sbox span{display:none}
+  .top .setb{display:inline-flex!important;border-radius:var(--rs)}
+  .top .cloud{margin:0}
+  .brand small{display:none}
+  .dock{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr)) 74px repeat(2,minmax(0,1fr));left:0;right:0;bottom:0;transform:none;border-radius:0;border:0;border-top:1px solid var(--line);height:calc(var(--bnav) + var(--sab));padding:0 env(safe-area-inset-right,0px) var(--sab) env(safe-area-inset-left,0px);background:var(--glass);gap:0}
+  .dock a,.dock button{width:auto;height:var(--bnav);border-radius:0;font-size:10.5px;font-weight:600;color:var(--mute)}
+  .dock a.on{background:none;color:var(--accent)}
+  .dock a.on svg{animation:navPop .4s cubic-bezier(.2,.9,.3,1.4)}
+  .dock .fab{order:0;justify-self:center;align-self:start;width:56px;height:56px;margin:-22px 0 0;border-radius:16px;transform:rotate(45deg);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 80%,#fff),var(--accent));border:3px solid var(--bg);box-shadow:0 6px 20px rgba(var(--acc-rgb),.35)}
+  .dock .fab svg{transform:rotate(-45deg);width:25px;height:25px}
+  .dock a:nth-child(1){order:-2}.dock a:nth-child(2){order:-1}
+  body{padding-bottom:calc(var(--bnav) + var(--sab) + 30px)}
+  .wside{top:auto}
+}
+@keyframes navPop{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:none}}
+
+/* ---------- boot: calm animated logo ---------- */
+#boot{background:var(--bg)!important;background-image:radial-gradient(700px 420px at 50% 0%,rgba(var(--acc-rgb),.16),transparent 65%),var(--bgpat,none)!important;background-size:auto,160px 160px!important;gap:18px}
+#boot .bn{font-family:var(--f-tech);font-weight:900;font-size:26px;letter-spacing:.32em;color:var(--fg)}
+#boot .bn em{font-style:normal;color:var(--accent)}
+#boot .bc{color:var(--dim)}#boot .bc b{color:var(--fg)}
+#boot .bb{background:var(--line2)}
+.core{position:relative;width:150px;height:150px;display:grid;place-items:center}
+.core .r{position:absolute;border-radius:50%;border:1.5px solid rgba(var(--acc-rgb),.5)}
+.core .r1{inset:0;border-style:dashed;border-color:rgba(var(--acc-rgb),.35);animation:spin 16s linear infinite}
+.core .r2{inset:14%;border-color:transparent;border-top-color:var(--accent);border-bottom-color:rgba(var(--acc-rgb),.5);animation:spin 3.2s linear infinite reverse;box-shadow:0 0 18px rgba(var(--acc-rgb),.22)}
+.core .r3{inset:27%;border-color:rgba(var(--acc-rgb),.18);border-left-color:var(--accent);animation:spin 6s linear infinite}
+.core .pulse{position:absolute;inset:32%;border-radius:50%;background:radial-gradient(circle,rgba(var(--acc-rgb),.42),transparent 70%);animation:corePulse 2.4s ease-in-out infinite}
+.core svg{position:relative;width:46%;height:46%;filter:drop-shadow(0 0 12px rgba(var(--acc-rgb),.6))}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes corePulse{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+
+/* ---------- page transitions ---------- */
+.view.enter>*{animation:cardIn .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*55ms)}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.985);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+.view.enter .lhead h1,.view.enter .wtitle{animation:hudType .6s steps(1) both}
+@keyframes hudType{0%{opacity:0}15%{opacity:1}22%{opacity:.25}30%{opacity:1}40%{opacity:.6}48%,100%{opacity:1}}
+#warp{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:0}
+#warp.go{animation:warpOn .7s ease-out}
+#warp::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent) 30%,#fff 50%,var(--accent) 70%,transparent);box-shadow:0 0 16px var(--accent),0 0 46px rgba(var(--acc-rgb),.4)}
+#warp::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(var(--acc-rgb),.05) 0 1px,transparent 1px 4px)}
+#warp.go::before{animation:warpScan .7s cubic-bezier(.4,.6,.2,1) both}
+@keyframes warpOn{0%,75%{opacity:1}100%{opacity:0}}
+@keyframes warpScan{from{transform:translateY(0)}to{transform:translateY(100vh)}}
+@media (prefers-reduced-motion:reduce){.view.enter>*,#warp,.core .r,.core .pulse{animation:none!important}}
+
+/* ---------- light mode details ---------- */
+:root[data-mode="light"] .top{background:color-mix(in srgb,#fff 94%,transparent)}
+:root[data-mode="light"] .tog::after{background:#fff;box-shadow:0 1px 3px rgba(16,22,34,.25)}
+:root[data-mode="light"] .tog:not([aria-checked="true"]){background:#d5d9e0}
+:root[data-mode="light"] .logo svg{filter:none}
+:root[data-mode="light"] .core svg{filter:none}
+
+/* ================= YOUTUBE-LIKE HOME ================= */
+.ytchips{position:sticky;top:calc(var(--sat) + 60px);z-index:40;margin:0 calc(-1*max(16px,env(safe-area-inset-right,0px))) 0;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+@media (min-width:901px){.ytchips{top:0;margin:0;padding:16px 0 12px}}
+.chip.ghostc{border-style:dashed}
+.ytgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:28px 16px;margin-top:10px}
+.yth .sh{margin-top:14px}
+.vav{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--c);background:color-mix(in srgb,var(--c) 16%,var(--card));border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent)}
+.grid.list .vav{display:none}
+@media (max-width:600px){.ytgrid{grid-template-columns:1fr;gap:22px}.ytgrid .vt{border-radius:12px}}
+
+/* ================= PERSISTENT PLAYER ================= */
+.pslot{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:var(--r);background:#000}
+.pv{z-index:5}
+.pv-frame.player{width:100%;height:100%;box-shadow:none}
+.pv.full{position:absolute;border-radius:var(--r);overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 0 1px var(--line2)}
+.pv.full .pv-bar{display:none}
+.pv.mini{position:fixed;z-index:66;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(20px + var(--sab));width:min(360px,calc(100vw - 32px));border-radius:14px;overflow:hidden;background:var(--card);border:1px solid var(--line2);box-shadow:0 22px 60px rgba(0,0,0,.55);animation:pvIn .3s cubic-bezier(.2,.8,.2,1)}
+.pv.mini .pv-frame{aspect-ratio:16/9;height:auto;border-radius:0}
+@keyframes pvIn{from{opacity:0;transform:translateY(16px) scale(.96)}}
+.pv-bar{display:flex;align-items:center;gap:4px;padding:6px 6px 6px 8px;border-top:1px solid var(--line)}
+.pv-t{flex:1;min-width:0;display:grid;gap:0;text-align:start;background:none;border:0;padding:4px 8px;color:var(--fg)}
+.pv-t b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-t small{font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-b{width:40px;height:40px;flex:none;border-radius:50%;border:0;background:transparent;color:var(--fg);display:grid;place-items:center}
+.pv-b:hover{background:var(--card2)}
+.pv-b svg{width:20px;height:20px}
+.wmore{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.wmore>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;color:var(--dim);font-size:14px;font-weight:600}
+.wmore>summary::-webkit-details-marker{display:none}
+.wmore>summary svg:last-child{margin-inline-start:auto;transition:transform .2s;transform:rotate(-90deg)}
+.wmore[open]>summary svg:last-child{transform:rotate(90deg)}
+.wmore .ctrl{margin:0 12px 12px}.wmore .wbelow{margin:0 12px 12px}
+@media (max-width:900px){
+  /* watch page like YouTube: video pinned under the top bar */
+  .pv.full{position:fixed;top:calc(var(--sat) + 60px);left:0;right:0;width:100%;height:auto;border-radius:0;z-index:58;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .pv.full .pv-frame{aspect-ratio:16/9;height:auto;border-radius:0}
+  .pslot{margin-inline:calc(-1*max(16px,env(safe-area-inset-right,0px)));border-radius:0;max-width:none}
+  .stage .ambi{display:none}
+  .watch{grid-template-columns:minmax(0,1fr)!important}.wmain,.wside{min-width:0}
+  .watch{margin-top:0}
+  .view .back{display:none}
+  .wmain>.eyebrow{display:none}
+  .wtitle{margin-top:14px}
+  .wacts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1*max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-right,0px))}
+  .wacts::-webkit-scrollbar{display:none}
+  .wacts .btn{flex:none}
+  .pv.mini{left:8px;right:8px;width:auto;bottom:calc(var(--bnav) + var(--sab) + 8px);display:flex;align-items:center;border-radius:12px}
+  .pv.mini .pv-frame{width:132px;flex:none}
+  .pv.mini .pv-bar{flex:1;min-width:0;border-top:0}
+  body.pv-mini{padding-bottom:calc(var(--bnav) + var(--sab) + 110px)}
+}
+@media (min-width:901px){body.pv-mini .foot{margin-bottom:200px}}
 </style>
 
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-logo" viewBox="0 0 48 48"><path d="M24 3 42 13.5v21L24 45 6 34.5v-21Z" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/><path d="M19.5 15.5v17l14-8.5Z" fill="var(--fg)"/><circle cx="35.5" cy="33.5" r="2.4" fill="var(--accent)"/></symbol></svg>
 <div id="boot" aria-hidden="true">
-  <div class="bl"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></div>
-  <div class="bn">ALI VISION</div>
+  <div class="core"><i class="r r1"></i><i class="r r2"></i><i class="r r3"></i><span class="pulse"></span><svg viewBox="0 0 48 48"><use href="#i-logo"/></svg></div>
+  <div class="bn">ALI<em>VISION</em></div>
   <div class="bb"><i></i></div>
   <div class="bc">تصميم وبرمجة <b>علي مالك</b></div>
 </div>
@@ -415,18 +646,29 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <header class="top gut">
   <div class="top-in">
     <a class="brand" href="#home" aria-label="الرئيسية">
-      <span class="logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></span>
+      <span class="logo"><svg viewBox="0 0 48 48"><use href="#i-logo"/></svg></span>
       <span><b id="siteName">علي فيجن</b><small>ALI · VISION</small></span>
     </a>
-    <nav class="nav" id="nav"><a href="#home" data-r="home">الرئيسية</a><a href="#library" data-r="library">المكتبة</a><a href="#favs" data-r="favs">المفضلة</a></nav>
-    <button class="sbox" id="bSearch"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>ابحث بمقاطعك…</span><span class="kbd">Ctrl K</span></button>
+    <div class="navlbl">الأقسام</div>
+    <nav class="nav" id="nav"><a href="#home" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9H5v-9"/></svg><span>الرئيسية</span><span class="ix">01</span></a><a href="#library" data-r="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>المكتبة</span><span class="ix">02</span></a><a href="#favs" data-r="favs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>المفضلة</span><span class="ix">03</span></a></nav>
+    <button class="sbox" id="bSearch"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>دوّر بمقاطعك…</span><span class="kbd">Ctrl K</span></button>
+    <div class="sclock"><b class="num" id="sClk">--:--:--</b><span>SYS · UTC+3</span></div>
     <span class="cloud" id="cloudDot" title="حالة المزامنة"><i></i><span class="t" id="cloudTxt">محلي</span></span>
-    <button class="btn pri addb" id="bAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span class="t">إضافة</span></button>
+    <div class="scredit">تصميم وبرمجة <b>علي مالك</b></div>
+    <button class="btn pri addb" id="bAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg><span class="t">إضافة مقطع</span></button>
     <button class="btn ic setb" id="bSet" aria-label="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
   </div>
 </header>
 
 <main class="wrap gut" id="app"></main>
+<div id="pv" class="pv" hidden>
+  <div class="player pv-frame" id="player"><div id="ytp"></div></div>
+  <div class="pv-bar">
+    <button class="pv-t" id="pvOpen" aria-label="افتح المقطع"><b id="pvTitle"></b><small id="pvSub"></small></button>
+    <button class="pv-b" id="pvPlay" aria-label="تشغيل أو إيقاف"></button>
+    <button class="pv-b" id="pvClose" aria-label="سدّ المشغّل"></button>
+  </div>
+</div>
 
 <nav class="dock" id="dock" aria-label="التنقل">
   <a href="#home" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9H5v-9"/></svg>الرئيسية</a>
@@ -439,6 +681,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div id="layer"></div>
 <div id="menuL"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div id="warp" aria-hidden="true"></div>
 
 <script>
 (()=>{
@@ -488,7 +731,7 @@ const sv=(k,s=16)=>I[k].replace('<svg',`<svg width="${s}" height="${s}"`);
 
 /* ================= state ================= */
 const now=Date.now();
-const DEF_SET={name:'علي فيجن',accent:'#e3172b',mode:'dark',glow:60,bg:'aurora',corners:'soft',size:'m',motion:true,intro:true,autonext:true,view:'grid',sort:'new',speed:1};
+const DEF_SET={name:'علي فيجن',accent:'#e3172b',mode:'dark',glow:60,bg:'pattern',corners:'soft',size:'m',motion:true,intro:true,autonext:true,view:'grid',sort:'new',speed:1};
 function seed(){return{
   settings:{...DEF_SET},
   sections:[{id:'s1',name:'تمارين',color:'#e3172b'},{id:'s2',name:'تغذية ومكملات',color:'#2fd27a'},{id:'s3',name:'تحفيز',color:'#ff8a1a'}],
@@ -505,6 +748,7 @@ if(!S){let old=null;try{old=JSON.parse(localStorage.getItem(OLDKEY))}catch(e){}
 S.settings={...DEF_SET,...S.settings};S.cloud=S.cloud||{config:''};
 S.videos.forEach(v=>{v.marks=v.marks||[];v.pos=v.pos||0;v.dur=v.dur||0;v.plays=v.plays||0});
 if(!S.settings.name||S.settings.name==='الدزاز فيجن')S.settings.name='علي فيجن';
+if(!S.settings.amStyle){S.settings.amStyle=1;S.settings.bg='pattern';S.settings.corners='soft'}
 const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const save=()=>{saveLocal();cloudPush()};
 const editable=()=>!S.lock||S.unlocked;
@@ -526,7 +770,7 @@ function sig(vid,wave=true){const h=hue(vid);let p='';for(let i=0;i<=24;i++){p+=
 const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="this.remove()" onload="if(this.naturalWidth<=120)this.remove()">`;
 const secOf=id=>S.sections.find(s=>s.id===id);
 const pct=v=>v.watched?100:(v.dur?Math.min(100,Math.round(v.pos/v.dur*100)):0);
-const ago=t=>{if(!t)return'';const d=(Date.now()-t)/1000;if(d<60)return'الآن';if(d<3600)return`قبل ${Math.floor(d/60)} د`;if(d<86400)return`قبل ${Math.floor(d/3600)} س`;const n=Math.floor(d/86400);return n===1?'أمس':`قبل ${n} يوم`};
+const ago=t=>{if(!t)return'';const d=(Date.now()-t)/1000;if(d<60)return'هسه';if(d<3600)return`قبل ${Math.floor(d/60)} د`;if(d<86400)return`قبل ${Math.floor(d/3600)} س`;const n=Math.floor(d/86400);return n===1?'أمس':`قبل ${n} يوم`};
 
 /* ================= settings apply ================= */
 function apply(){
@@ -534,10 +778,14 @@ function apply(){
   root.style.setProperty('--accent',st.accent);
   const [R,G,B]=[1,3,5].map(i=>parseInt(st.accent.slice(i,i+2),16));
   root.style.setProperty('--accent-ink',(R*.299+G*.587+B*.114)>170?'#0a0a0a':'#ffffff');
+  root.style.setProperty('--acc-rgb',R+','+G+','+B);
+  const pt=(x,y)=>`<g transform='translate(${x} ${y}) scale(.55)'><path d='M24 3 42 13.5v21L24 45 6 34.5v-21Z'/><path d='M19.5 15.5v17l14-8.5Z'/></g>`;
+  root.style.setProperty('--bgpat',`url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='${st.accent}' stroke-opacity='.05' stroke-width='2.4' stroke-linejoin='round'>${pt(20,20)}${pt(100,100)}</g></svg>`)}")`);
+  const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=st.mode==='light'?'#f3f4f7':'#0b0c10';
   root.style.setProperty('--glow',st.glow/100);
   root.style.setProperty('--card-w',{s:'clamp(180px,19vw,240px)',m:'clamp(220px,23vw,300px)',l:'clamp(270px,30vw,380px)'}[st.size]);
   root.style.setProperty('--gw',{s:'200px',m:'260px',l:'340px'}[st.size]);
-  root.dataset.mode=st.mode;root.dataset.corners=st.corners;root.dataset.motion=st.motion?'on':'off';
+  root.dataset.mode=st.mode;root.dataset.corners=st.corners;root.dataset.bg=st.bg;root.dataset.motion=st.motion?'on':'off';
   $('#siteName').textContent=st.name;document.title=st.name;
   $('#aurora').classList.toggle('off',st.bg!=='aurora');
   bgReset();
@@ -553,8 +801,8 @@ function openLayer(html,closeCb){
 }
 function closeLayer(silent){const L=$('#layer');if(!L.innerHTML)return;L.innerHTML='';const c=onClose;onClose=null;if(c&&!silent)c()}
 function confirmBox(msg,yes,cb){
-  openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>تأكيد</h4><button class="xb" data-close aria-label="إغلاق">${I.x}</button></div>
-  <div class="pb"><p style="margin:0">${msg}</p></div><div class="pf"><button class="btn pri" id="cYes">${yes}</button><button class="btn" data-close>إلغاء</button></div></div>`);
+  openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>تأكيد</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
+  <div class="pb"><p style="margin:0">${msg}</p></div><div class="pf"><button class="btn pri" id="cYes">${yes}</button><button class="btn" data-close>رجوع</button></div></div>`);
   $('#cYes').onclick=()=>{closeLayer(true);cb()};
 }
 function closeMenu(){$('#menuL').innerHTML=''}
@@ -592,7 +840,7 @@ function card(v){
    ${p>0&&p<100?`<span class="bar"><i style="width:${p}%"></i></span>`:''}
   </button>
   <button class="vfav ${v.fav?'on':''}" data-fav="${v.id}" aria-label="مفضلة">${v.fav?I.heartF:I.heart}</button>
-  <div class="vi"><div class="tx"><div class="tt" data-play="${v.id}">${esc(v.title)}</div>
+  <div class="vi"><span class="vav" style="--c:${sec?sec.color:'var(--mute)'}" title="${sec?esc(sec.name):''}">${sec?esc(sec.name.trim().charAt(0)):'•'}</span><div class="tx"><div class="tt" data-play="${v.id}">${esc(v.title)}</div>
    <div class="mm">${sec?`<i style="background:${sec.color}"></i>${esc(sec.name)}`:'بدون قسم'}<span>·</span><span class="num">${v.plays} تشغيل</span>${v.last?`<span>·</span><span>${ago(v.last)}</span>`:''}</div></div>
    <button class="dots" data-menu="${v.id}" aria-label="خيارات">${I.dots}</button></div>
   </article>`;
@@ -628,13 +876,13 @@ function heroHTML(v){
   const sec=secOf(v.section),p=pct(v),isCont=!v.watched&&v.pos>5;
   return`<div class="bd">${img(v.vid,'maxresdefault',false)}</div>
   <div class="hc">
-   <span class="pill"><span class="live"></span>${isCont?'كمّل من حيث توقفت':v.fav?'من مفضلتك':'أُضيف حديثاً'}</span>
+   <span class="pill"><span class="live"></span>${isCont?'كمّل من حيث توقفت':v.fav?'من مفضلتك':'جديد'}</span>
    <h1>${esc(v.title)}</h1>
    <div class="hm">${sec?`<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:8px;height:8px;border-radius:2px;transform:rotate(45deg);background:${sec.color};display:inline-block"></i>${esc(sec.name)}</span>`:''}
     ${v.dur?`<span>·</span><span class="num">${fmtT(v.dur)}</span>`:''}<span>·</span><span class="num">${v.plays} تشغيل</span></div>
-   ${isCont?`<div class="hprog"><i style="width:${p}%"></i></div><div class="hm num">باقي ${fmtT(v.dur-v.pos)}</div>`:''}
+   ${isCont?`<div class="hprog"><i style="width:${p}%"></i></div><div class="hm">باقي <span class="num" style="font-family:var(--f-hud)">${fmtT(v.dur-v.pos)}</span></div>`:''}
    ${v.note?`<div class="hn">${esc(v.note)}</div>`:''}
-   <div class="ha"><button class="btn pri" data-play="${v.id}">${I.play}${isCont?'كمّل المشاهدة':'شغّل الآن'}</button>
+   <div class="ha"><button class="btn pri" data-play="${v.id}">${I.play}${isCont?'كمّل المشاهدة':'شغّل هسه'}</button>
     <button class="btn" data-fav="${v.id}">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'للمفضلة'}</button></div>
   </div>
   <button class="hthumb" data-play="${v.id}" aria-label="تشغيل">${img(v.vid,'hqdefault',true)}<span class="pg"><span class="playorb">${I.play}</span></span></button>`;
@@ -643,57 +891,53 @@ function setHero(i){
   if(!heroList.length)return;heroI=(i+heroList.length)%heroList.length;
   const h=$('#hero');if(!h)return;h.innerHTML=heroHTML(heroList[heroI])+(heroList.length>1?`<div class="hdots">${heroList.map((_,k)=>`<button class="${k===heroI?'on':''}" data-hero="${k}" aria-label="شريحة ${k+1}"></button>`).join('')}</div>`:'');
 }
+let homeF='all';
 function renderHome(){
-  heroList=heroPicks();heroI=0;
-  const cont=listFor('cont').sort((a,b)=>(b.last||0)-(a.last||0));
-  const recent=S.videos.slice().sort((a,b)=>b.added-a.added).slice(0,14);
-  const favs=listFor('fav');
-  const tiles=S.sections.map(s=>{const vs=S.videos.filter(v=>v.section===s.id),w=vs.filter(v=>v.watched).length,pc=vs.length?w/vs.length:0,c=2*Math.PI*15;
-    return`<button class="tile" style="--c:${s.color}" data-goto="${s.id}"><div class="mos">${[0,1,2].map(i=>`<div>${vs[i]?img(vs[i].vid,'mqdefault',false):''}</div>`).join('')}</div>
-    <div class="tc"><div><b>${esc(s.name)}</b><div class="cnt num">${vs.length} مقطع</div></div>
-    <svg class="ring" viewBox="0 0 38 38"><circle cx="19" cy="19" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="3"/><circle cx="19" cy="19" r="15" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="${(c*pc).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 19 19)"/><text x="19" y="22.5" text-anchor="middle" font-size="10" fill="#fff" font-family="Chakra Petch">${Math.round(pc*100)}</text></svg></div></button>`}).join('')
-    +(editable()?`<button class="tile newt" id="tNew"><span>${sv('plus',26)}قسم جديد</span></button>`:'');
-  $('#app').innerHTML=`<div class="view">
-   ${heroList.length?`<section class="hero" id="hero"></section>`:''}
-   ${editable()?`<form class="qadd" id="qadd" autocomplete="off"><div class="qi">${I.link}<input id="qUrl" placeholder="الصق رابط يوتيوب هنا وخلي الباقي عليّ…" aria-label="رابط يوتيوب"></div>
+  clearInterval(heroT);
+  const cnt=id=>listFor(id).length;
+  const sys=[['all','الكل'],['cont','كمّل المشاهدة'],['fav','المفضلة'],['unw','ما شفتها']].filter(([id])=>id==='all'||cnt(id));
+  const chips=sys.map(([id,n])=>`<button class="chip ${homeF===id?'on':''}" data-hf="${id}">${n}${id!=='all'?`<span class="n num">${cnt(id)}</span>`:''}</button>`).join('')
+    +S.sections.map(s=>`<button class="chip ${homeF===s.id?'on':''}" data-hf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}</button>`).join('')
+    +(editable()?`<button class="chip ghostc" id="mngSec">${sv('folder',15)}الأقسام</button>`:'');
+  const L=listFor(homeF);
+  const cont=homeF==='all'?listFor('cont').sort((a,b)=>(b.last||0)-(a.last||0)).slice(0,12):[];
+  $('#app').innerHTML=`<div class="view yth">
+   <div class="chips ytchips">${chips}</div>
+   ${editable()&&!S.videos.length?`<form class="qadd" id="qadd" autocomplete="off"><div class="qi">${I.link}<input id="qUrl" placeholder="الصق رابط يوتيوب هنا وخلي الباقي عليّ…" aria-label="رابط يوتيوب"></div>
     <select id="qSec" aria-label="القسم">${S.sections.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}<option value="">بدون قسم</option></select>
     <button class="btn pri" type="submit">${I.plus}إضافة</button><div class="qprev" id="qPrev" hidden></div></form>`:''}
-   ${S.videos.length?'':`<div style="margin-top:24px">${emptyBox('مكتبتك فارغة','الصق أول رابط يوتيوب بالمربع اللي فوق، أو بأي مكان بالصفحة.')}</div>`}
-   ${shelf('كمّل المشاهدة',cont)}
-   <section><div class="sh"><h2>أقسامك <small class="num">${S.sections.length}</small></h2>${editable()?`<button class="more" id="mngSec">إدارة الأقسام ${sv('left',14)}</button>`:''}</div><div class="tiles">${tiles}</div></section>
-   ${shelf('أُضيفت حديثاً',recent,{goto:'all'})}
-   ${shelf('المفضلة',favs,{goto:'fav',color:'var(--accent)'})}
-   ${S.sections.map(s=>shelf(esc(s.name),listFor(s.id),{goto:s.id,color:s.color})).join('')}
+   ${S.videos.length?'':`<div style="margin-top:18px">${emptyBox('مكتبتك فارغة','الصق أول رابط يوتيوب بالمربع اللي فوگ، أو دوس + وضيفه.')}</div>`}
+   ${cont.length?shelf('كمّل المشاهدة',cont):''}
+   ${S.videos.length?`<div class="grid ytgrid">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','اختار قسم ثاني، أو دوس + وضيف مقطع.')}</div>`:''}
    <p class="foot">${esc(S.settings.name)} · تصميم وبرمجة <b>علي مالك</b></p></div>`;
-  setHero(0);clearInterval(heroT);
-  if(heroList.length>1&&S.settings.motion)heroT=setInterval(()=>{if(!document.hidden&&!$('#hero:hover'))setHero(heroI+1)},7000);
   const qa=$('#qadd');if(qa){
     const u=$('#qUrl'),pv=$('#qPrev');
     u.oninput=()=>{const p=parseYT(u.value);if(!u.value.trim()){pv.hidden=true;return}pv.hidden=false;
-      pv.innerHTML=p?`<span class="t">${img(p.vid,'mqdefault',false)}</span><span>تم رصد المقطع${S.videos.some(x=>x.vid===p.vid)?' <span style="color:var(--warn)">· موجود مسبقاً</span>':''}</span>`:'<span class="bad">هذا مو رابط يوتيوب. من يوتيوب اضغط مشاركة ← نسخ الرابط.</span>'};
+      pv.innerHTML=p?`<span class="t">${img(p.vid,'mqdefault',false)}</span><span>لگيت المقطع${S.videos.some(x=>x.vid===p.vid)?' <span style="color:var(--warn)">· موجود مسبقاً</span>':''}</span>`:'<span class="bad">هذا مو رابط يوتيوب. من يوتيوب اضغط مشاركة ← نسخ الرابط.</span>'};
     qa.onsubmit=e=>{e.preventDefault();const p=parseYT(u.value);if(!p){toast('الصق رابط يوتيوب صحيح');u.focus();return}addVideo(p,$('#qSec').value);u.value='';pv.hidden=true};
   }
 }
 function addVideo(p,sec,title='',note=''){
-  const v={id:uid(),vid:p.vid,title:title||'جاري جلب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
-  S.videos.push(v);save();rerender();toast('أُضيف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
+  const v={id:uid(),vid:p.vid,title:title||'دا يجيب العنوان…',section:sec,note,start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};
+  S.videos.push(v);save();rerender();toast('انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
   if(!title)fetchTitle(v);return v;
 }
 function fetchTitle(v){
-  const fallback=()=>{if(v.title==='جاري جلب العنوان…'){v.title='مقطع '+v.vid;save();rerender()}};
+  const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title='مقطع '+v.vid;save();rerender()}};
   if(!ONLINE){fallback();return}
   fetch('https://noembed.com/embed?url='+encodeURIComponent('https://www.youtube.com/watch?v='+v.vid)).then(r=>r.json()).then(j=>{if(j.title){v.title=j.title;save();rerender()}else fallback()}).catch(fallback);
 }
 
+document.addEventListener('click',e=>{const b=e.target.closest('[data-hf]');if(!b)return;homeF=b.dataset.hf;const y=scrollY;renderHome();scrollTo({top:Math.min(y,($('.ytchips')?.offsetTop||0)),behavior:'instant'})});
 /* ================= LIBRARY ================= */
 let libF='all';
 function renderLibrary(f){
   if(f)libF=f;const L=listFor(libF);
   const cnt=id=>listFor(id).length;
-  const sys=[['all','الكل','var(--fg)'],['fav','المفضلة','var(--accent)'],['cont','قيد المشاهدة','var(--warn)'],['unw','لم أشاهدها','var(--mute)']];
-  const title=libF==='all'?'كل المقاطع':libF==='fav'?'المفضلة':libF==='cont'?'قيد المشاهدة':libF==='unw'?'لم أشاهدها':esc(secOf(libF)?.name||'');
+  const sys=[['all','الكل','var(--fg)'],['fav','المفضلة','var(--accent)'],['cont','قيد المشاهدة','var(--warn)'],['unw','ما شفتها','var(--mute)']];
+  const title=libF==='all'?'كل المقاطع':libF==='fav'?'المفضلة':libF==='cont'?'قيد المشاهدة':libF==='unw'?'ما شفتها':esc(secOf(libF)?.name||'');
   $('#app').innerHTML=`<div class="view">
-  <div class="lhead"><div><h1>${title}</h1><p class="num">${L.length} مقطع${L.length?` · ${fmtT(L.reduce((a,v)=>a+(v.dur||0),0))} مدة معروفة`:''}</p></div>
+  <div class="lhead"><div><div class="eyebrow"><span>${libF==='fav'?'03 · FAVORITES':'02 · LIBRARY'}</span><b>ALI-VISION</b></div><h1>${title}</h1><p class="num">${L.length} مقطع${L.length?` · ${fmtT(L.reduce((a,v)=>a+(v.dur||0),0))} مدة معروفة`:''}</p></div>
    <div class="ltools">
     ${L.length>1?`<button class="btn sm" id="playAll">${sv('play',14)}تشغيل الكل</button><button class="btn sm ghost" id="shuf">${sv('shuffle',15)}عشوائي</button>`:''}
     <select class="sel" id="sort" aria-label="ترتيب"><option value="new">الأحدث</option><option value="recent">آخر تشغيل</option><option value="old">الأقدم</option><option value="plays">الأكثر تشغيلاً</option><option value="az">أبجدي</option></select>
@@ -708,7 +952,7 @@ function renderLibrary(f){
   $('#sort').onchange=e=>{S.settings.sort=e.target.value;saveLocal();renderLibrary()};
   $('#vG').onclick=()=>{S.settings.view='grid';saveLocal();renderLibrary()};
   $('#vL').onclick=()=>{S.settings.view='list';saveLocal();renderLibrary()};
-  const raw=libF==='all'?'كل المقاطع':libF==='fav'?'المفضلة':libF==='cont'?'قيد المشاهدة':libF==='unw'?'لم أشاهدها':(secOf(libF)?.name||'');
+  const raw=libF==='all'?'كل المقاطع':libF==='fav'?'المفضلة':libF==='cont'?'قيد المشاهدة':libF==='unw'?'ما شفتها':(secOf(libF)?.name||'');
   const pa=$('#playAll');if(pa)pa.onclick=()=>playCtx(L[0].id,L.map(v=>v.id),raw);
   const sh=$('#shuf');if(sh)sh.onclick=()=>{const a=L.map(v=>v.id).sort(()=>Math.random()-.5);playCtx(a[0],a,'تشغيل عشوائي')};
 }
@@ -723,26 +967,54 @@ function loadYTApi(){
     const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=rej;document.head.append(s);setTimeout(()=>rej('timeout'),8000)});
   ytApi.catch(()=>{ytApi=null});return ytApi;
 }
-function stopPlayer(){clearInterval(ytTimer);clearInterval(cdT);if(yt&&cur){try{const t=yt.getCurrentTime?.();if(t)cur.pos=t}catch(e){}save()}try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;document.body.classList.remove('cine-on');cine=false}
+function stopPlayer(){clearInterval(ytTimer);clearInterval(cdT);if(yt&&cur){try{const t=yt.getCurrentTime?.();if(t)cur.pos=t}catch(e){}save()}try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;document.body.classList.remove('cine-on');cine=false;
+  PV.id=null;cur=null;const pv=$('#pv');pv.hidden=true;pv.className='pv';pv.style.cssText='';$('#player').innerHTML='<div id="ytp"></div>';document.body.classList.remove('pv-mini');if(!route.startsWith('w-'))rerender()}
+/* ---- persistent player: full on the watch page, mini when you leave it ---- */
+const PV={id:null,mode:null};
+const IC_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+function pvState(st){const b=$('#pvPlay');if(b)b.innerHTML=st===1||st===3?IC_PAUSE:I.play}
+function pvShow(mode){
+  const pv=$('#pv');pv.hidden=false;PV.mode=mode;
+  pv.classList.toggle('mini',mode==='mini');pv.classList.toggle('full',mode==='full');document.body.classList.toggle('pv-mini',mode==='mini');
+  if(mode==='mini'){pv.style.cssText='';$('#pvTitle').textContent=cur?cur.title:'';$('#pvSub').textContent=Q.name||(cur&&secOf(cur.section)?.name)||'';
+    try{pvState(yt&&yt.getPlayerState?yt.getPlayerState():1)}catch(e){pvState(1)}}
+  else pvSync();
+}
+function pvSync(){
+  if(PV.mode!=='full')return;const sl=$('#pslot'),pv=$('#pv');if(!sl)return;
+  if(matchMedia('(max-width:900px)').matches){pv.style.cssText='';return}
+  const r=sl.getBoundingClientRect();pv.style.cssText=`top:${Math.round(r.top+scrollY)}px;left:${Math.round(r.left+scrollX)}px;width:${Math.round(r.width)}px;height:${Math.round(r.height)}px`;
+}
+function pvFollow(ms){const end=performance.now()+ms;const f=()=>{pvSync();if(performance.now()<end&&PV.mode==='full')requestAnimationFrame(f)};requestAnimationFrame(f)}
+addEventListener('resize',()=>requestAnimationFrame(pvSync));
+document.addEventListener('toggle',e=>{if(e.target.matches&&e.target.matches('.wmore'))pvFollow(300)},true);
+try{new ResizeObserver(()=>pvSync()).observe($('#app'))}catch(e){}
+$('#pvOpen').onclick=()=>{if(PV.id)go('w-'+PV.id)};
+$('#pvPlay').onclick=()=>{try{yt.getPlayerState()===1?yt.pauseVideo():yt.playVideo()}catch(e){if(PV.id)go('w-'+PV.id)}};
+$('#pvClose').innerHTML=I.x;
+$('#pvClose').onclick=()=>stopPlayer();
 function renderWatch(id){
   const v=S.videos.find(x=>x.id===id);if(!v){go('home');return}
   if(!Q.ids.includes(id))defaultQueue(v);
-  cur=v;v.plays++;v.last=Date.now();S.lastId=v.id;save();
+  const same=PV.id===v.id&&(yt||!ONLINE);
+  if(cur&&cur!==v&&yt){try{cur.pos=yt.getCurrentTime()||cur.pos}catch(e){}saveLocal()}
+  cur=v;if(!same)v.plays++;v.last=Date.now();S.lastId=v.id;save();
   const sec=secOf(v.section),qi=Q.ids.indexOf(id);
   $('#app').innerHTML=`<div class="view">
    <button class="back" id="bBack">${sv('right',16)}رجوع</button>
    <div class="watch">
     <div class="wmain">
-     <div class="stage"><div class="ambi">${img(v.vid,'mqdefault',false)}</div><div class="player" id="player"><div id="ytp"></div></div></div>
-     <h1 class="wtitle">${esc(v.title)}</h1>
-     <div class="wmeta">${sec?`<span class="tag"><i style="background:${sec.color}"></i>${esc(sec.name)}</span>`:''}<span class="num">${v.plays} تشغيل</span>${v.dur?`<span>·</span><span class="num">${fmtT(v.dur)}</span>`:''}<span>·</span><span>أُضيف ${ago(v.added)}</span></div>
+     <div class="stage"><div class="ambi">${img(v.vid,'mqdefault',false)}</div><div class="pslot" id="pslot"></div></div>
+     <div class="eyebrow" style="margin-top:20px"><span>NOW · PLAYING</span><b>ALI-VISION</b></div><h1 class="wtitle">${esc(v.title)}</h1>
+     <div class="wmeta">${sec?`<span class="tag"><i style="background:${sec.color}"></i>${esc(sec.name)}</span>`:''}<span class="num">${v.plays} تشغيل</span>${v.dur?`<span>·</span><span class="num">${fmtT(v.dur)}</span>`:''}<span>·</span><span>انضاف ${ago(v.added)}</span></div>
      <div class="wacts">
       <button class="btn sm ${v.fav?'on':''}" id="wFav">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'مفضلة'}</button>
-      <button class="btn sm ${v.watched?'on':''}" id="wDone">${I.check}${v.watched?'تمت المشاهدة':'تمت المشاهدة؟'}</button>
+      <button class="btn sm ${v.watched?'on':''}" id="wDone">${I.check}${v.watched?'شفته':'شفته؟'}</button>
       <button class="btn sm" id="wCopy">${I.copy}نسخ الرابط</button>
       <a class="btn sm" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}يوتيوب</a>
       ${editable()?`<button class="btn sm" id="wEdit">${I.edit}تعديل</button>`:''}
      </div>
+     <details class="wmore"><summary>${sv('gear',16)}السرعة، التكرار، العلامات والملاحظات${sv('left',14)}</summary>
      <div class="ctrl" id="ctrl">
       <span class="lbl">السرعة</span><div class="seg" id="spd">${[.75,1,1.25,1.5,2].map(s=>`<button data-sp="${s}" class="${S.settings.speed==s?'on':''} num">${s}×</button>`).join('')}</div>
       <span class="sp"></span>
@@ -753,7 +1025,7 @@ function renderWatch(id){
      <div class="wbelow">
       <div class="box"><h3>العلامات الزمنية <button class="btn sm" id="addMark">${sv('flag',14)}علّم هذي اللحظة</button></h3><div id="marks"></div></div>
       <div class="box"><h3>ملاحظاتي <span class="muted" id="nSaved"></span></h3><textarea id="wNote" placeholder="اكتب ملاحظاتك على المقطع… تنحفظ تلقائياً" ${editable()?'':'readonly'}>${esc(v.note)}</textarea></div>
-     </div>
+     </div></details>
     </div>
     <aside class="wside"><div class="hd"><div><b>${esc(Q.name||'قائمة التشغيل')}</b><small class="num">${qi+1} من ${Q.ids.length}</small></div>
      <div style="display:flex;gap:6px"><button class="xb" id="wPrev" aria-label="السابق" ${qi<=0?'disabled':''}>${sv('prev',14)}</button><button class="xb" id="wNext" aria-label="التالي" ${qi>=Q.ids.length-1?'disabled':''}>${sv('next',14)}</button></div></div>
@@ -764,8 +1036,8 @@ function renderWatch(id){
   const cq=document.querySelector('.qit.now');if(cq)cq.scrollIntoView({block:'nearest'});
   $('#bBack').onclick=()=>history.length>1?history.back():go('home');
   $('#wFav').onclick=()=>{v.fav=!v.fav;save();const b=$('#wFav');b.classList.toggle('on',v.fav);b.innerHTML=(v.fav?I.heartF:I.heart)+(v.fav?'بالمفضلة':'مفضلة')};
-  $('#wDone').onclick=()=>{v.watched=!v.watched;if(v.watched)v.pos=0;save();const b=$('#wDone');b.classList.toggle('on',v.watched);b.innerHTML=I.check+(v.watched?'تمت المشاهدة':'تمت المشاهدة؟')};
-  $('#wCopy').onclick=()=>copy(ytUrl(v,yt?.getCurrentTime?.()||v.start),'تم نسخ الرابط مع الوقت الحالي');
+  $('#wDone').onclick=()=>{v.watched=!v.watched;if(v.watched)v.pos=0;save();const b=$('#wDone');b.classList.toggle('on',v.watched);b.innerHTML=I.check+(v.watched?'شفته':'شفته؟')};
+  $('#wCopy').onclick=()=>copy(ytUrl(v,yt?.getCurrentTime?.()||v.start),'انتسخ الرابط ويا الوقت الحالي');
   const we=$('#wEdit');if(we)we.onclick=()=>openEditor(v.id);
   $('#spd').onclick=e=>{const b=e.target.closest('[data-sp]');if(!b)return;S.settings.speed=+b.dataset.sp;saveLocal();$('#spd').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));try{yt.setPlaybackRate(S.settings.speed)}catch(e){}};
   $('#tAuto').onclick=e=>{S.settings.autonext=!S.settings.autonext;saveLocal();e.currentTarget.classList.toggle('on',S.settings.autonext)};
@@ -776,38 +1048,45 @@ function renderWatch(id){
   $('#addMark').onclick=()=>{
     if(!editable()){toast('الموقع مقفل');return}
     const t=yt?.getCurrentTime?.();if(t==null){toast('العلامات تشتغل بعد رفع الموقع على الاستضافة');return}
-    v.marks.push({t:Math.floor(t),l:'لحظة '+fmtT(t)});v.marks.sort((a,b)=>a.t-b.t);save();renderMarks();toast('تم حفظ العلامة عند '+fmtT(t))};
-  mountPlayer(v);
+    v.marks.push({t:Math.floor(t),l:'لحظة '+fmtT(t)});v.marks.sort((a,b)=>a.t-b.t);save();renderMarks();toast('انحفظت العلامة عند '+fmtT(t))};
+  pvShow('full');
+  if(!same)mountPlayer(v);else{const pb=$('#player');pb.querySelectorAll('.nextup').forEach(e=>e.remove())}
+  pvFollow(900);
 }
 function renderMarks(){
   const v=cur,el=$('#marks');if(!el)return;
   el.innerHTML=v.marks.length?v.marks.map((m,i)=>`<div class="bm" role="button" tabindex="0" data-seek="${m.t}"><span class="t num">${fmtT(m.t)}</span><span class="l" ${editable()?`contenteditable="true" data-mi="${i}"`:''}>${esc(m.l)}</span>${editable()?`<button class="x" data-mdel="${i}" aria-label="حذف العلامة">${sv('x',14)}</button>`:''}</div>`).join(''):'<div class="muted">علّم اللحظات المهمة بالمقطع حتى ترجعلها بضغطة.</div>';
 }
 function step(d){const i=Q.ids.indexOf(cur.id)+d;if(i>=0&&i<Q.ids.length)go('w-'+Q.ids[i])}
+function ensureYtp(){const box=$('#player');if(!$('#ytp')){box.innerHTML='<div id="ytp"></div>';yt=null}return box}
 function mountPlayer(v){
-  const box=$('#player');
-  const fallbackMsg=()=>{box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>صفحة المعاينة هذي تمنع تشغيل يوتيوب داخلها. افتح الموقع من رابط GitHub Pages، أو شغّل المقطع على يوتيوب.</p><a class="btn pri" href="${ytUrl(v,v.pos>5?v.pos:v.start)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`};
+  const box=$('#player');PV.id=v.id;clearInterval(cdT);clearInterval(ytTimer);box.querySelectorAll('.nextup').forEach(e=>e.remove());
+  const fallbackMsg=()=>{try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>صفحة المعاينة هذي تمنع تشغيل يوتيوب داخلها. افتح الموقع من رابط GitHub Pages، أو شغّل المقطع على يوتيوب.</p><a class="btn pri" href="${ytUrl(v,v.pos>5?v.pos:v.start)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`};
   if(!ONLINE){fallbackMsg();return}
+  ensureYtp();
   const resume=(!v.watched&&v.pos>5&&(!v.dur||v.pos<v.dur-10))?Math.floor(v.pos):(v.start||0);
+  if(yt&&yt.loadVideoById){try{yt.loadVideoById({videoId:v.vid,startSeconds:resume});yt.setPlaybackRate(S.settings.speed)}catch(e){}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));return}
   loadYTApi().then(()=>{
-    if(cur!==v)return;
+    if(cur!==v)return;ensureYtp();
     yt=new YT.Player('ytp',{videoId:v.vid,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,rel:0,modestbranding:1,playsinline:1,start:resume,origin:location.origin},
       events:{
-        onReady:e=>{try{e.target.setPlaybackRate(S.settings.speed)}catch(_){}const d=e.target.getDuration();if(d){v.dur=Math.round(d);saveLocal()}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));e.target.playVideo()},
+        onReady:e=>{const v=cur;try{e.target.setPlaybackRate(S.settings.speed)}catch(_){}const d=e.target.getDuration();if(v&&d){v.dur=Math.round(d);saveLocal()}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));e.target.playVideo()},
         onStateChange:e=>{
+          const v=cur;pvState(e.data);if(!v)return;
           if(e.data===1){clearInterval(ytTimer);ytTimer=setInterval(()=>{try{v.pos=yt.getCurrentTime();if(!v.dur)v.dur=Math.round(yt.getDuration());if(v.dur&&v.pos/v.dur>.93&&!v.watched){v.watched=true;save()}else saveLocal()}catch(_){}},4000)}
           else if(e.data===2){clearInterval(ytTimer);try{v.pos=yt.getCurrentTime()}catch(_){}save()}
           else if(e.data===0){clearInterval(ytTimer);v.watched=true;v.pos=0;save();
             if(loopOn){yt.seekTo(0);yt.playVideo();return}
-            const i=Q.ids.indexOf(v.id);if(S.settings.autonext&&i<Q.ids.length-1)countdown(S.videos.find(x=>x.id===Q.ids[i+1]))}
+            const i=Q.ids.indexOf(v.id),nx=S.videos.find(x=>x.id===Q.ids[i+1]);
+            if(S.settings.autonext&&nx){if(route.startsWith('w-'))countdown(nx);else{cur=nx;nx.plays++;nx.last=Date.now();save();mountPlayer(nx);pvShow('mini')}}}
         },
-        onError:e=>{const c=e.data;box.innerHTML=`<div class="pmsg"><b>${c===101||c===150?'صاحب المقطع منع تشغيله خارج يوتيوب':c===100?'المقطع محذوف أو خاص':'ما گدرنا نشغّل المقطع'}</b><p>تگدر تشوفه مباشرة على يوتيوب.</p><a class="btn pri" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`}
+        onError:e=>{const c=e.data,v=cur||{};try{yt.destroy()}catch(_){}yt=null;box.innerHTML=`<div class="pmsg"><b>${c===101||c===150?'صاحب المقطع منع تشغيله خارج يوتيوب':c===100?'المقطع محذوف أو خاص':'ما گدرنا نشغّل المقطع'}</b><p>تگدر تشوفه مباشرة على يوتيوب.</p><a class="btn pri" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`}
       }});
-  }).catch(()=>{if(cur!==v)return;box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.vid}?autoplay=1&rel=0&playsinline=1&start=${resume}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(v.title)}"></iframe>`});
+  }).catch(()=>{if(cur!==v)return;try{yt&&yt.destroy()}catch(_){}yt=null;box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.vid}?autoplay=1&rel=0&playsinline=1&start=${resume}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(v.title)}"></iframe>`});
 }
 function countdown(nx){
   if(!nx)return;let n=6;const box=$('#player');const o=document.createElement('div');o.className='nextup';
-  const draw=()=>{o.innerHTML=`<div class="nb"><div class="nt">${img(nx.vid,'mqdefault',false)}</div><div style="display:flex;flex-direction:column;gap:10px;max-width:280px"><span style="opacity:.7;font-size:13px">التالي خلال</span><span class="cd num">${n}</span><b style="line-height:1.4">${esc(nx.title)}</b><div style="display:flex;gap:8px"><button class="btn pri sm" id="cdGo">${I.play}شغّل الآن</button><button class="btn sm" id="cdNo" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">إلغاء</button></div></div></div>`;
+  const draw=()=>{o.innerHTML=`<div class="nb"><div class="nt">${img(nx.vid,'mqdefault',false)}</div><div style="display:flex;flex-direction:column;gap:10px;max-width:280px"><span style="opacity:.7;font-size:13px">التالي خلال</span><span class="cd num">${n}</span><b style="line-height:1.4">${esc(nx.title)}</b><div style="display:flex;gap:8px"><button class="btn pri sm" id="cdGo">${I.play}شغّل هسه</button><button class="btn sm" id="cdNo" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">إلغاء</button></div></div></div>`;
     o.querySelector('#cdGo').onclick=()=>{clearInterval(cdT);go('w-'+nx.id)};o.querySelector('#cdNo').onclick=()=>{clearInterval(cdT);o.remove()}};
   draw();box.append(o);clearInterval(cdT);cdT=setInterval(()=>{n--;if(n<=0){clearInterval(cdT);go('w-'+nx.id)}else o.querySelector('.cd').textContent=n},1000);
 }
@@ -819,7 +1098,7 @@ function openEditor(id,pre=''){
   const v=id?S.videos.find(x=>x.id===id):null;
   const defSec=v?v.section:(S.sections.find(s=>s.id===libF)?.id||S.sections[0]?.id||'');
   openLayer(`<div class="panel" role="dialog" aria-modal="true" aria-labelledby="edH">
-   <div class="ph"><h4 id="edH">${v?'تعديل المقطع':'إضافة مقطع'}</h4><button class="xb" data-close aria-label="إغلاق">${I.x}</button></div>
+   <div class="ph"><h4 id="edH">${v?'تعديل المقطع':'إضافة مقطع'}</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
    <div class="pb">
     ${v?'':`<div class="seg" style="align-self:flex-start"><button class="on" data-mode="one">رابط واحد</button><button data-mode="bulk">عدة روابط</button></div>`}
     <div id="mOne" style="display:flex;flex-direction:column;gap:14px">
@@ -832,23 +1111,23 @@ function openEditor(id,pre=''){
     <div class="field"><label for="fSec">القسم</label><select class="in" id="fSec">${secOptions(defSec)}</select></div>
     <div class="field" id="nsF" hidden><label for="fNS">اسم القسم الجديد</label><input class="in" id="fNS" placeholder="مثلاً: تمارين الأرجل"></div>
    </div>
-   <div class="pf"><button class="btn pri" id="fSave">${v?'حفظ':'إضافة'}</button><button class="btn" data-close>إلغاء</button></div></div>`);
+   <div class="pf"><button class="btn pri" id="fSave">${v?'حفظ':'إضافة'}</button><button class="btn" data-close>رجوع</button></div></div>`);
   let mode='one',parsed=null;
   const fu=$('#fUrl'),det=$('#det');
   const check=()=>{parsed=parseYT(fu.value);
     if(!fu.value.trim()){det.innerHTML='<span class="muted">بانتظار الرابط…</span>';return}
     if(!parsed){det.innerHTML='<span class="bad">الرابط غير معروف. من يوتيوب: مشاركة ← نسخ الرابط.</span>';return}
     const dup=S.videos.find(x=>x.vid===parsed.vid&&x.id!==id);
-    det.innerHTML=`<div class="pv">${img(parsed.vid,'mqdefault',false)}</div><div><div class="ok" style="font-weight:600">تم رصد المقطع</div>${parsed.start?`<div class="muted">يبدأ من ${fmtT(parsed.start)}</div>`:''}${dup?`<div style="color:var(--warn)">موجود مسبقاً: ${esc(dup.title)}</div>`:''}</div>`};
+    det.innerHTML=`<div class="pv">${img(parsed.vid,'mqdefault',false)}</div><div><div class="ok" style="font-weight:600">لگيت المقطع</div>${parsed.start?`<div class="muted">يبدأ من ${fmtT(parsed.start)}</div>`:''}${dup?`<div style="color:var(--warn)">موجود مسبقاً: ${esc(dup.title)}</div>`:''}</div>`};
   fu.oninput=check;check();
   $('#fSec').onchange=e=>{$('#nsF').hidden=e.target.value!=='__new';if(e.target.value==='__new')$('#fNS').focus()};
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('on',x===b));$('#mOne').style.display=mode==='one'?'flex':'none';$('#mBulk').hidden=mode!=='bulk'});
-  const fb=$('#fBulk');if(fb)fb.oninput=()=>{const ls=fb.value.split(/\s+/).filter(Boolean);$('#bInfo').textContent=ls.length?`تم رصد ${ls.filter(parseYT).length} من ${ls.length}`:''};
+  const fb=$('#fBulk');if(fb)fb.oninput=()=>{const ls=fb.value.split(/\s+/).filter(Boolean);$('#bInfo').textContent=ls.length?`لگيت ${ls.filter(parseYT).length} من ${ls.length}`:''};
   $('#fSave').onclick=()=>{
     let sec=$('#fSec').value;
     if(sec==='__new'){const n=$('#fNS').value.trim();if(!n){toast('اكتب اسم القسم');return}const s={id:uid(),name:n,color:S.settings.accent};S.sections.push(s);sec=s.id}
     if(mode==='bulk'){const items=$('#fBulk').value.split(/\s+/).map(parseYT).filter(Boolean);if(!items.length){toast('ما لگيت روابط صحيحة');return}
-      closeLayer(true);items.forEach(p=>{const nv={id:uid(),vid:p.vid,title:'جاري جلب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`أُضيف ${items.length} مقطع`);return}
+      closeLayer(true);items.forEach(p=>{const nv={id:uid(),vid:p.vid,title:'دا يجيب العنوان…',section:sec,note:'',start:p.start,fav:false,watched:false,plays:0,added:Date.now(),last:0,pos:0,dur:0,marks:[]};S.videos.push(nv);fetchTitle(nv)});save();rerender();toast(`انضاف ${items.length} مقطع`);return}
     if(!parsed){toast('الرابط غير صحيح');fu.focus();return}
     const title=$('#fTitle').value.trim(),note=$('#fNote').value.trim();
     closeLayer(true);
@@ -863,7 +1142,7 @@ function openSections(){
   if(!editable())return;
   const rows=()=>S.sections.map((s,i)=>`<div class="secrow" data-sid="${s.id}"><input type="color" value="${s.color}" data-scol aria-label="لون"><input class="in" value="${esc(s.name)}" data-sname aria-label="اسم القسم">
    <button class="xb" data-up="${i}" aria-label="رفع" ${i===0?'disabled':''}>↑</button><button class="xb" data-sdel="${s.id}" aria-label="حذف">${sv('trash',15)}</button></div>`).join('')||'<div class="muted">ماكو أقسام بعد</div>';
-  openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>إدارة الأقسام</h4><button class="xb" data-close aria-label="إغلاق">${I.x}</button></div>
+  openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>إدارة الأقسام</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
    <div class="pb"><div id="sl" style="display:flex;flex-direction:column;gap:8px">${rows()}</div>
    <div class="secrow"><input class="in" id="nsN" placeholder="اسم قسم جديد"><button class="btn pri" id="nsA">إضافة</button></div></div>
    <div class="pf"><button class="btn pri" data-close>تم</button></div></div>`,()=>{save();rerender()});
@@ -878,7 +1157,7 @@ function openSections(){
 
 /* ================= palette ================= */
 function openPalette(){
-  openLayer(`<div class="panel pal" role="dialog" aria-modal="true" aria-label="بحث"><div class="pi">${I.search}<input id="pq" placeholder="ابحث بالعنوان، القسم، الملاحظات…" autofocus autocomplete="off"><span class="kbd">Esc</span></div><div class="pres" id="pres"></div></div>`);
+  openLayer(`<div class="panel pal" role="dialog" aria-modal="true" aria-label="بحث"><div class="pi">${I.search}<input id="pq" placeholder="دوّر بالعنوان، القسم، الملاحظات…" autofocus autocomplete="off"><span class="kbd">Esc</span></div><div class="pres" id="pres"></div></div>`);
   let sel=0,items=[];
   const cmds=[{t:'إضافة مقطع',ic:'plus',run:()=>openEditor()},{t:'المكتبة',ic:'grid',run:()=>go('library')},{t:'إدارة الأقسام',ic:'folder',run:()=>openSections()},{t:'الإعدادات',ic:'gear',run:()=>openSettings()},
     {t:'تشغيل عشوائي',ic:'shuffle',run:()=>{const a=S.videos.map(v=>v.id).sort(()=>Math.random()-.5);if(a.length)playCtx(a[0],a,'تشغيل عشوائي')}}];
@@ -907,13 +1186,13 @@ function openSettings(){
   const opt=(k,arr)=>`<div class="seg" role="group">${arr.map(([v,l])=>`<button data-opt="${k}" data-v="${v}" class="${st[k]===v?'on':''}">${l}</button>`).join('')}</div>`;
   const ed=editable();
   $('#layer').innerHTML=`<div class="ov" id="ovr" style="padding:0"></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="الإعدادات">
-   <div class="dh"><h4>الإعدادات</h4><button class="xb" data-close aria-label="إغلاق">${I.x}</button></div>
+   <div class="dh"><h4>الإعدادات</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
    <div class="grp"><h5>الهوية</h5><div class="field"><label for="sName">اسم الموقع</label><input class="in" id="sName" value="${esc(st.name)}" ${ed?'':'disabled'}></div></div>
    <div class="grp"><h5>المظهر</h5>
     <div class="srow"><span>الوضع</span>${opt('mode',[['dark','داكن'],['light','فاتح']])}</div>
     <div class="field"><label>لون الطاقة</label><div class="sws">${PRESETS.map(([c,n])=>`<button class="sw ${st.accent===c?'on':''}" style="background:${c}" data-acc="${c}" aria-label="${n}" title="${n}"></button>`).join('')}<input type="color" id="sAcc" value="${st.accent}" aria-label="لون مخصص" title="لون مخصص"></div></div>
     <div class="field"><label for="sGlow">قوة التوهج <span class="num" id="gv">${st.glow}%</span></label><input type="range" id="sGlow" min="0" max="100" value="${st.glow}"></div>
-    <div class="srow"><span>الخلفية</span>${opt('bg',[['aurora','شفق'],['grid','شبكة'],['stars','نجوم'],['off','هادئة']])}</div>
+    <div class="srow"><span>الخلفية</span>${opt('bg',[['pattern','الشعار'],['aurora','شفق'],['grid','شبكة'],['stars','نجوم'],['off','هادئة']])}</div>
     <div class="srow"><span>الحواف</span>${opt('corners',[['soft','ناعمة'],['sharp','حادة']])}</div>
     <div class="srow"><span>حجم البطاقات</span>${opt('size',[['s','صغير'],['m','متوسط'],['l','كبير']])}</div>
     ${tog('motion','الحركات والتأثيرات')}${tog('intro','شاشة الافتتاح')}
@@ -949,12 +1228,12 @@ function openSettings(){
   const co=$('#cOff');if(co)co.onclick=()=>{S.cloud.config='';saveLocal();cloudStop();openSettings();toast('أُلغي الربط، البيانات صارت محلية')};
   $('#lBtn').onclick=async()=>{const p=$('#lPin').value.trim();if(p.length<4){toast('الرمز لازم 4 أرقام أو أكثر');return}const h=await sha(p);
     if(S.lock&&!S.unlocked){if(h===S.lock){S.unlocked=true;saveLocal();toast('انفتح التعديل على هذا الجهاز');openSettings();rerender()}else toast('الرمز غلط')}
-    else{S.lock=h;S.unlocked=true;save();toast('تم تفعيل القفل');openSettings();rerender()}};
+    else{S.lock=h;S.unlocked=true;save();toast('اشتغل القفل');openSettings();rerender()}};
   const ll=$('#lLock');if(ll)ll.onclick=()=>{S.unlocked=false;saveLocal();openSettings();rerender();toast('انقفل هذا الجهاز')};
   const lr=$('#lRem');if(lr)lr.onclick=()=>{S.lock=null;save();openSettings();rerender();toast('أُزيل القفل')};
-  $('#bExp').onclick=()=>copy(JSON.stringify(shared()),'تم نسخ البيانات');
+  $('#bExp').onclick=()=>copy(JSON.stringify(shared()),'انتسخت البيانات');
   const dl=$('#bDl');if(dl)dl.onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(shared(),null,1)],{type:'application/json'}));a.download='ali-vision-backup.json';a.click()};
-  const restore=txt=>{if(!editable()){toast('الموقع مقفل');return}try{const d=JSON.parse(txt);if(!Array.isArray(d.videos)||!Array.isArray(d.sections))throw 0;applyShared(d);save();closeLayer(true);rerender();toast('تمت الاستعادة')}catch(e){toast('البيانات تالفة أو مو من هذا الموقع')}};
+  const restore=txt=>{if(!editable()){toast('الموقع مقفل');return}try{const d=JSON.parse(txt);if(!Array.isArray(d.videos)||!Array.isArray(d.sections))throw 0;applyShared(d);save();closeLayer(true);rerender();toast('رجعت البيانات')}catch(e){toast('البيانات تالفة أو مو من هذا الموقع')}};
   $('#bImp').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(restore)};
   $('#bRest').onclick=()=>restore($('#bPaste').value);
   const br=$('#bReset');if(br)br.onclick=()=>confirmBox('مسح كل المقاطع والأقسام؟ إذا المزامنة شغالة، ينمسح من كل الأجهزة.','مسح الكل',()=>{S.sections=[];S.videos=[];S.lastId=null;save();rerender();toast('تم المسح')});
@@ -973,7 +1252,7 @@ async function cloudInit(manual){
   const cfg=parseCfg(S.cloud.config)||BUILTIN_FIREBASE;
   if(!cfg){if(manual)toast('الإعدادات ناقصة، لازم يكون بيها apiKey و projectId');return}
   if(!ONLINE){setCloud('err','المزامنة تشتغل على رابط الموقع المنشور فقط');return}
-  setCloud('','جاري الاتصال…');
+  setCloud('','دا يتصل…');
   try{
     const V='10.12.2';
     await loadScript(`https://cdn.jsdelivr.net/npm/firebase@${V}/firebase-app-compat.js`);
@@ -988,7 +1267,7 @@ async function cloudInit(manual){
       try{const keepCur=cur;applyShared(JSON.parse(d.payload));if(keepCur){const i=S.videos.findIndex(x=>x.id===keepCur.id);if(i>-1){const n=S.videos[i];const pos=Math.max(n.pos||0,keepCur.pos||0);Object.assign(keepCur,n,{pos});S.videos[i]=keepCur}}saveLocal();apply();rerender(true)}catch(e){}
       setCloud('on','متزامن · كل الأجهزة تشوف نفس المحتوى');
     },err=>{setCloud('err',err.code==='permission-denied'?'قاعدة البيانات رفضت الوصول. عدّل قواعد Firestore (شوف التعليمات)':'انقطع الاتصال: '+err.message)});
-    if(manual)toast('تم الربط');
+    if(manual)toast('انربط');
   }catch(e){setCloud('err','ما گدرت أتصل. تأكد من الإعدادات والإنترنت')}
 }
 function cloudPush(now){
@@ -999,11 +1278,24 @@ function cloudPush(now){
 /* ================= router ================= */
 let route='home';
 function go(h){if(location.hash==='#'+h)onRoute();else location.hash=h}
+let ROUTED=false,FXT=null;
+function fxEnter(){
+  if(!S.settings.motion||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const v=$('#app .view');if(!v)return;[...v.children].forEach((c,i)=>c.style.setProperty('--i',Math.min(i,8)));v.classList.add('enter');
+  const w=$('#warp');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');
+  clearTimeout(FXT);FXT=setTimeout(()=>{v.classList.remove('enter');w.classList.remove('go')},1200);
+}
 function onRoute(){
   const h=location.hash.slice(1)||'home';
   const wasWatch=route.startsWith('w-');
+  /* leaving the library resets its filter so it opens fresh next time */
+  if((route==='library'||route==='favs')&&h!=='library'&&h!=='favs')libF='all';
   if(h==='library'&&route==='favs'&&libF==='fav')libF='all';
-  if(wasWatch)stopPlayer();cur=null;clearInterval(heroT);closeMenu();
+  const toWatch=h.startsWith('w-');
+  if(wasWatch&&!toWatch){clearInterval(cdT);document.querySelectorAll('#player .nextup').forEach(e=>e.remove());document.body.classList.remove('cine-on');cine=false;
+    if(PV.id&&(yt||!ONLINE))pvShow('mini');else stopPlayer()}
+  if(route==='home'&&h!=='home')homeF='all';
+  clearInterval(heroT);closeMenu();
   route=h;
   document.querySelectorAll('[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r===(h==='favs'?'favs':h.startsWith('w-')?'':h)));
   if(h.startsWith('w-'))renderWatch(h.slice(2));
@@ -1011,6 +1303,7 @@ function onRoute(){
   else if(h==='favs'){renderLibrary('fav');document.querySelectorAll('[data-r]').forEach(a=>a.classList.toggle('on',a.dataset.r==='favs'))}
   else renderHome();
   scrollTo({top:0,behavior:'instant'});
+  if(ROUTED)fxEnter();ROUTED=true;
 }
 function rerender(soft){
   if(route.startsWith('w-')){if(!soft&&cur){/* keep player running */const s=$('#qlist');if(s)s.scrollTop=s.scrollTop}return}
@@ -1038,11 +1331,11 @@ document.addEventListener('click',e=>{
   if(t.dataset.mv){e.stopPropagation();moveMenu(t,id);return}
   closeMenu();
   if(t.dataset.play){const ctx=t.closest('.row,.grid');if(ctx){const ids=[...ctx.querySelectorAll('.vc')].map(c=>c.dataset.id);const h=ctx.closest('section,.view')?.querySelector('h1,h2');playCtx(id,ids,h?[...h.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():'')}else go('w-'+id);return}
-  if(t.dataset.fav){v.fav=!v.fav;save();rerender();toast(v.fav?'أُضيف للمفضلة':'أُزيل من المفضلة');return}
+  if(t.dataset.fav){v.fav=!v.fav;save();rerender();toast(v.fav?'انضاف للمفضلة':'انشال من المفضلة');return}
   if(t.dataset.watch){v.watched=!v.watched;if(v.watched)v.pos=0;save();rerender();return}
-  if(t.dataset.copy){copy(ytUrl(v),'تم نسخ الرابط');return}
+  if(t.dataset.copy){copy(ytUrl(v),'انتسخ الرابط');return}
   if(t.dataset.edit){openEditor(id);return}
-  if(t.dataset.del)confirmBox(`حذف «${esc(v.title)}»؟`,'حذف',()=>{S.videos=S.videos.filter(x=>x.id!==id);save();rerender();toast('تم الحذف')});
+  if(t.dataset.del)confirmBox(`حذف «${esc(v.title)}»؟`,'حذف',()=>{S.videos=S.videos.filter(x=>x.id!==id);save();rerender();toast('انحذف')});
 });
 document.addEventListener('focusout',e=>{const m=e.target.closest?.('[data-mi]');if(m&&cur){const i=+m.dataset.mi;if(cur.marks[i]){cur.marks[i].l=m.textContent.trim()||cur.marks[i].l;save()}}});
 document.addEventListener('keydown',e=>{
@@ -1090,6 +1383,10 @@ function frame(){
 }
 addEventListener('resize',()=>{clearTimeout(bgReset.t);bgReset.t=setTimeout(bgReset,150)});
 
+/* sidebar clock */
+setInterval(()=>{const c=$('#sClk');if(!c||!c.offsetParent)return;const d=new Date(),p=n=>String(n).padStart(2,'0');c.textContent=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())},1000);
+/* iOS: snap back after the keyboard closes */
+(()=>{let t;const f=()=>{clearTimeout(t);t=setTimeout(()=>{const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;scrollTo(0,Math.min(scrollY,Math.max(0,document.documentElement.scrollHeight-innerHeight)))},120)};document.addEventListener('focusout',f);if(window.visualViewport)visualViewport.addEventListener('resize',f)})();
 /* ================= boot ================= */
 function boot(){const B=$('#boot');if(!S.settings.intro||RM||!S.settings.motion){B.remove();return}
   const end=()=>{B.classList.add('gone');setTimeout(()=>B.remove(),650)};B.onclick=end;setTimeout(end,1700)}
