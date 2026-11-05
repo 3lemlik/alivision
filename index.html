@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-12">
+<meta name="app-build" content="2026.11.05-14">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1152,7 +1152,7 @@ body.is-playing .mixnow i{animation:corePulse 1.2s infinite}
 
 /* ===== v12: competition polish ===== */
 :focus-visible{outline:2px solid var(--accent)!important;outline-offset:3px;border-radius:10px}
-.ytgrid .vc{content-visibility:auto;contain-intrinsic-size:auto 330px}
+
 .vc:hover .vt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-4px)!important}
 .vt{transform-style:preserve-3d;will-change:transform}
 .spot .sbg img{translate:calc(var(--px,0)*-18px) calc(var(--py,0)*-12px);transition:translate .4s ease-out}
@@ -1191,6 +1191,31 @@ body.is-playing .mixnow i{animation:corePulse 1.2s infinite}
 .mdp .pvw.auto{background:linear-gradient(105deg,#0b0d18 50%,#f4f5fb 50%);border:1px solid rgba(128,128,160,.25)}
 .mdp .pvw.auto i{color:#888}
 @media (prefers-reduced-motion:reduce){.skel .sk i{animation:none}.spot .sbg img,.spot .sc{translate:none}}
+
+/* ===== v13: light on the phone's memory ===== */
+.vt{will-change:auto!important}
+.sig.done::after{display:none}
+.gmore{grid-column:1/-1;height:1px}
+@media (hover:none),(max-width:900px){
+  .vt .bdg,.vc .mus-b,.chip,.vfav,.grid.list .vc,.wacts .btn,.tl i,.spot .tag,.spot .acts .btn:not(.pri),.wmore,.wside,.lhead,.act,.empty{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .chip{background:var(--card)!important}
+  .vt .bdg.dur,.vc .mus-b{background:rgba(0,0,0,.72)!important}
+  .wmore,.wside,.lhead,.act,.empty,.grid.list .vc{background:var(--card)!important}
+  .vt::after{display:none}
+  .vt{transition:none}
+}
+
+/* ===== v14: crash-safe on iPhone ===== */
+@media (hover:none){
+  body{background-attachment:scroll!important}
+  .sig::after{display:none!important}
+  .vt{box-shadow:0 0 0 1px var(--glass-b)!important}
+  .spot .sbg img,.spot .sbg .sig{animation:none!important}
+}
+html.lite *,html.lite *::before,html.lite *::after{animation:none!important;transition:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html.lite body{background-image:none!important}
+html.lite #fx,html.lite .aurora{display:none!important}
+html.lite .top,html.lite .dock,html.lite .pv.mini,html.lite .toast{background:var(--card)!important}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1329,6 +1354,9 @@ const MODES={n:{r:1,l:'عادي',d:'الصوت الأصلي'},s:{r:.75,l:'سلو
 if(S.settings.vol==null)S.settings.vol=100;if(!MODES[S.settings.mmode])S.settings.mmode='n';if(S.settings.fade==null)S.settings.fade=true;
 if(!S.settings.name||S.settings.name==='الدزاز فيجن')S.settings.name='علي فيجن';
 if(!S.settings.amStyle){S.settings.amStyle=1;S.settings.bg='pattern';S.settings.corners='soft'}
+let LITE=0;try{LITE=+localStorage.getItem('av-boot')||0;localStorage.setItem('av-boot',String(LITE+1))}catch(e){}
+const bootOk=()=>{try{localStorage.setItem('av-boot','0')}catch(e){}};setTimeout(bootOk,8000);addEventListener('pagehide',bootOk);document.addEventListener('visibilitychange',()=>{if(document.hidden)bootOk()});
+if(LITE)document.documentElement.classList.add('lite');
 const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const save=()=>{saveLocal();cloudPush()};
 const editable=()=>S.src==='pub'?!!(typeof AUTH!=='undefined'&&AUTH.admin):true;
@@ -1351,7 +1379,7 @@ const fmtT=s=>{s=Math.floor(+s||0);const h=Math.floor(s/3600),m=Math.floor(s%360
 const hue=str=>{let h=0;for(const c of str)h=(h*31+c.charCodeAt(0))%360;return h};
 function sig(vid,wave=true){const h=hue(vid);let p='';for(let i=0;i<=24;i++){p+=`${i*10},${(15+Math.sin(i*.9+h)*9*Math.sin(i*.3+h/40)).toFixed(1)} `}
   return`<div class="sig" style="background:linear-gradient(135deg,hsl(${h} 50% 18%),hsl(${(h+40)%360} 40% 8%) 70%)">${wave?`<svg class="wave" viewBox="0 0 240 30" preserveAspectRatio="none"><polyline points="${p}" fill="none" stroke="var(--accent)" stroke-width="2"/></svg><span class="id">${esc(vid)}</span>`:''}</div>`}
-const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="this.remove()" onload="if(this.naturalWidth<=120)this.remove();else this.classList.add('ld')">`;
+const img=(vid,q='hqdefault',wave=true)=>`${sig(vid,wave)}<img loading="lazy" alt="" src="https://i.ytimg.com/vi/${vid}/${q}.jpg" onerror="var g=this.previousElementSibling;if(g)g.classList.add('done');this.remove()" onload="var g=this.previousElementSibling;if(g)g.classList.add('done');if(this.naturalWidth<=120)this.remove();else this.classList.add('ld')">`;
 const secOf=id=>S.sections.find(s=>s.id===id);
 const norm=t=>String(t||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/گ/g,'ك').replace(/چ/g,'ج').replace(/پ/g,'ب').replace(/\s+/g,' ').trim();
 const hit=(x,q)=>{const h=norm(x.title+' '+x.note+' '+(secOf(x.section)?.name||''));return norm(q).split(' ').every(w=>h.includes(w))};
@@ -1426,6 +1454,10 @@ function moveMenu(btn,id){
 function copy(t,msg){try{navigator.clipboard.writeText(t).then(()=>toast(msg),()=>toast('ما گدرت أنسخ، انسخه يدوياً'))}catch(e){toast('ما گدرت أنسخ، انسخه يدوياً')}}
 
 /* ================= components ================= */
+const GR={L:[],n:0};let KEEPN=0,GOBS=null;
+function chunk(L){GR.L=L;GR.n=Math.min(L.length,Math.max(LITE>1?8:(matchMedia('(max-width:900px)').matches?16:24),KEEPN));setTimeout(armMore,0);return L.slice(0,GR.n).map(card).join('')+(L.length>GR.n?'<div class="gmore" id="gmore" aria-hidden="true"></div>':'')}
+function armMore(){try{GOBS&&GOBS.disconnect()}catch(e){}const m=$('#gmore');if(!m)return;
+  GOBS=new IntersectionObserver(es=>{if(!es.some(x=>x.isIntersecting))return;const nx=GR.L.slice(GR.n,GR.n+24);GR.n+=nx.length;m.insertAdjacentHTML('beforebegin',nx.map(card).join(''));if(GR.n>=GR.L.length){GOBS.disconnect();m.remove()}},{rootMargin:'900px 0px'});GOBS.observe(m)}
 function card(v){
   const sec=secOf(v.section),p=pct(v);
   return`<article class="vc" data-id="${v.id}" style="--c:${sec?sec.color:'var(--accent)'}">
@@ -1509,7 +1541,7 @@ function renderHome(){
     <button class="btn pri" type="submit">${I.plus}إضافة</button><div class="qprev" id="qPrev" hidden></div></form>`:''}
    ${!S.videos.some(isVid)&&S.src==='pub'&&ONLINE&&cloud.state===''?`<div class="grid ytgrid skel">${'<div class="sk"><i></i><b></b><b></b></div>'.repeat(6)}</div>`:S.videos.some(isVid)?'':`<div style="margin-top:18px">${editable()?emptyBox(S.src==='pub'?'المحتوى العام فارغ':'مكتبتك فارغة','الصق أول رابط بالمربع اللي فوگ، أو دوس + وضيفه.'):emptyBox('المحتوى العام فارغ لحد الآن','ينضاف محتوى قريباً. تگدر تحوّل للمحتوى الشخصي وتضيف مقاطعك.')}</div>`}
    ${cont.length?shelf('كمّل المشاهدة',cont):''}
-   ${S.videos.some(isVid)?`<div class="grid ytgrid">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','اختار قسم ثاني، أو دوس + وضيف مقطع.')}</div>`:''}
+   ${S.videos.some(isVid)?`<div class="grid ytgrid">${L.length?chunk(L):emptyBox('ماكو مقاطع هنا','اختار قسم ثاني، أو دوس + وضيف مقطع.')}</div>`:''}
    <p class="foot">${esc(S.settings.name)} · تصميم وبرمجة <b>علي مالك</b></p></div>`;
   spotArm();
   const qa=$('#qadd');if(qa){
@@ -1529,7 +1561,7 @@ function actHTML(){if(homeF!=='all')return'';const D=[...Array(7)].map((_,i)=>{c
   <div class="bars">${D.map((x,i)=>`<div class="bc ${i===6?'td':''}"><i style="height:${Math.max(6,x.s/mx*100)}%" title="${fm(x.s)}"></i><span>${N[x.d.getDay()]}</span></div>`).join('')}</div></div>`}
 function tilesHTML(){if(homeF!=='all')return'';const T=S.sections.map(x=>[x,listFor(x.id).length]).filter(([,n])=>n);if(!T.length)return'';
   return`<div class="tiles">${T.map(([x,n])=>`<button class="tl" style="--c:${x.color}" data-hf="${x.id}"><i>${I.play}</i><b>${esc(x.name)}</b><small class="num">${n} مقطع</small></button>`).join('')}</div>`}
-function spotHTML(){spotL=homeF==='all'?heroPicks():[];if(!spotL.length)return'';spotI=spotI%spotL.length;return`<div class="spot" id="spot">${spotInner()}</div>`}
+function spotHTML(){if(LITE>1)return'';spotL=homeF==='all'?heroPicks():[];if(!spotL.length)return'';spotI=spotI%spotL.length;return`<div class="spot" id="spot">${spotInner()}</div>`}
 function spotInner(){const v=spotL[spotI],sec=secOf(v.section),isCont=!v.watched&&v.pos>5;
   return`<div class="sbg">${img(v.vid,'maxresdefault',false)}</div><div class="sc"><span class="tag"><i></i>${isCont?'كمّل من حيث وگفت':v.fav?'من مفضلتك':'مختار إلك'}</span><h1>${esc(v.title)}</h1>
   <div class="meta">${sec?`<span>${esc(sec.name)}</span><span>·</span>`:''}${v.dur?`<span class="num">${fmtT(v.dur)}</span><span>·</span>`:''}<span class="num">${v.plays} تشغيل</span></div>
@@ -1545,11 +1577,12 @@ function addVideo(p,sec,title='',note='',kind='video'){
   S.videos.push(v);save();rerender();toast(kind==='music'?'انضافت للموسيقى':kind==='both'?'انضاف للفيديو والموسيقى':'انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
   if(!title)fetchTitle(v);return v;
 }
+let RRT=null;function rrLater(){clearTimeout(RRT);RRT=setTimeout(()=>rerender(true),700)}
 function fetchTitle(v){
-  const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title=v.list?'ميكس يوتيوب':'مقطع '+v.vid;save();rerender()}};
+  const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title=v.list?'ميكس يوتيوب':'مقطع '+v.vid;save();rrLater()}};
   if(!ONLINE){fallback();return}
   const u=v.vid?'https://www.youtube.com/watch?v='+v.vid:'https://www.youtube.com/playlist?list='+v.list;
-  fetch('https://noembed.com/embed?url='+encodeURIComponent(u)).then(r=>r.json()).then(j=>{if(j.title){if(!v.vid&&j.thumbnail_url){const m=j.thumbnail_url.match(/\/vi\/([A-Za-z0-9_-]{11})\//);if(m)v.vid=m[1]}v.title=(v.list&&v.vid&&isMix(v.list)?'ميكس · ':'')+j.title;save();rerender()}else fallback()}).catch(fallback);
+  fetch('https://noembed.com/embed?url='+encodeURIComponent(u)).then(r=>r.json()).then(j=>{if(j.title){if(!v.vid&&j.thumbnail_url){const m=j.thumbnail_url.match(/\/vi\/([A-Za-z0-9_-]{11})\//);if(m)v.vid=m[1]}v.title=(v.list&&v.vid&&isMix(v.list)?'ميكس · ':'')+j.title;save();rrLater()}else fallback()}).catch(fallback);
 }
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-hf]');if(!b)return;homeF=b.dataset.hf;const y=scrollY;renderHome();scrollTo({top:Math.min(y,($('.ytchips')?.offsetTop||0)),behavior:'instant'})});
@@ -1570,7 +1603,7 @@ function renderLibrary(f){
   <div class="chips">${sys.map(([id,n,c])=>`<button class="chip ${libF===id?'on':''}" data-lf="${id}"><span class="d" style="background:${c}"></span>${n}<span class="n num">${cnt(id)}</span></button>`).join('')}
    ${S.sections.filter(s=>!s.music).map(s=>`<button class="chip ${libF===s.id?'on':''}" data-lf="${s.id}"><span class="d" style="background:${s.color}"></span>${esc(s.name)}<span class="n num">${cnt(s.id)}</span></button>`).join('')}
    ${editable()?`<button class="chip" id="mngSec">${sv('folder',15)}إدارة الأقسام</button>`:''}</div>
-  <div class="grid ${S.settings.view==='list'?'list':''}">${L.length?L.map(card).join(''):emptyBox('ماكو مقاطع هنا','الصق رابط يوتيوب بأي مكان بالصفحة حتى تضيفه.')}</div>
+  <div class="grid ${S.settings.view==='list'?'list':''}">${L.length?chunk(L):emptyBox('ماكو مقاطع هنا','الصق رابط يوتيوب بأي مكان بالصفحة حتى تضيفه.')}</div>
   <p class="foot">تصميم وبرمجة <b>علي مالك</b></p></div>`;
   $('#sort').value=S.settings.sort;
   $('#sort').onchange=e=>{S.settings.sort=e.target.value;saveLocal();renderLibrary()};
@@ -2240,7 +2273,7 @@ function onRoute(){
 }
 function rerender(soft){
   if(isPR(route)){if(!soft&&cur){/* keep player running */const s=$('#qlist');if(s)s.scrollTop=s.scrollTop}return}
-  const y=scrollY;if(route==='music')renderMusic();else if(route==='library'||route==='favs')renderLibrary();else renderHome();scrollTo({top:y,behavior:'instant'});
+  const y=scrollY;KEEPN=GR.n;if(route==='music')renderMusic();else if(route==='library'||route==='favs')renderLibrary();else renderHome();KEEPN=0;scrollTo({top:y,behavior:'instant'});
 }
 addEventListener('hashchange',onRoute);
 
@@ -2263,7 +2296,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.menu){e.stopPropagation();openMenu(t,id);return}
   if(t.dataset.mv){e.stopPropagation();moveMenu(t,id);return}
   closeMenu();
-  if(t.dataset.play){const ctx=t.closest('.row,.grid');if(ctx){const ids=[...ctx.querySelectorAll('.vc')].map(c=>c.dataset.id);const h=ctx.closest('section,.view')?.querySelector('.sh h2,.lhead h1');playCtx(id,ids,h?[...h.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():'')}else goV(id);return}
+  if(t.dataset.play){const ctx=t.closest('.row,.grid');if(ctx){const ids=ctx.matches('.grid')&&GR.L.some(x=>x.id===id)?GR.L.map(x=>x.id):[...ctx.querySelectorAll('.vc')].map(c=>c.dataset.id);const h=ctx.closest('section,.view')?.querySelector('.sh h2,.lhead h1');playCtx(id,ids,h?[...h.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():'')}else goV(id);return}
   if(t.dataset.fav){v.fav=!v.fav;buzz();save();rerender();toast(v.fav?'انضاف للمفضلة':'انشال من المفضلة');return}
   if(t.dataset.watch){v.watched=!v.watched;if(v.watched)v.pos=0;save();rerender();return}
   if(t.dataset.copy){copy(ytUrl(v),'انتسخ الرابط');return}
@@ -2322,7 +2355,7 @@ setInterval(()=>{const c=$('#sClk');if(!c||!c.offsetParent)return;const d=new Da
 /* iOS: snap back after the keyboard closes */
 (()=>{let t;const f=()=>{clearTimeout(t);t=setTimeout(()=>{const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;scrollTo(0,Math.min(scrollY,Math.max(0,document.documentElement.scrollHeight-innerHeight)))},120)};document.addEventListener('focusout',f);if(window.visualViewport)visualViewport.addEventListener('resize',f)})();
 /* ================= boot ================= */
-function boot(){const B=$('#boot');if(!S.settings.intro||RM||!S.settings.motion){B.remove();return}
+function boot(){const B=$('#boot');if(LITE)setTimeout(()=>toast('شغّلنا الوضع الخفيف لأن الموقع وگف المرة الفاتت'),900);if(LITE||!S.settings.intro||RM||!S.settings.motion){B.remove();return}
   const end=()=>{B.classList.add('gone');setTimeout(()=>B.remove(),650)};B.onclick=end;setTimeout(end,1700)}
 
 apply();onRoute();boot();
