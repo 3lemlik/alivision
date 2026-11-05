@@ -630,6 +630,50 @@ h1,h2,h3,h4,.brand b,.tile b,.wtitle{font-family:var(--f-display)}
   body.pv-mini{padding-bottom:calc(var(--bnav) + var(--sab) + 110px)}
 }
 @media (min-width:901px){body.pv-mini .foot{margin-bottom:200px}}
+
+/* ================= CUSTOM PLAYER CONTROLS ================= */
+.pv-frame iframe{pointer-events:none}
+.pctl{position:absolute;inset:0;z-index:2;color:#fff;direction:ltr;user-select:none;-webkit-user-select:none}
+.pc-hit{position:absolute;inset:0;cursor:pointer}
+.pc-big{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 10px rgba(var(--acc-rgb),.22),0 0 40px rgba(var(--acc-rgb),.6);opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;pointer-events:none}
+.pc-big svg{width:30px;height:30px;margin-left:4px}
+.pctl[data-st="pause"] .pc-big,.pctl[data-st="idle"] .pc-big,.pctl[data-st="end"] .pc-big{opacity:1;transform:none;pointer-events:auto}
+.pctl[data-st="pause"],.pctl[data-st="end"]{background:radial-gradient(circle at 50% 50%,rgba(0,0,0,.25),rgba(0,0,0,.55))}
+.pc-load{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:var(--accent);opacity:0;animation:spin .9s linear infinite;pointer-events:none}
+.pctl[data-st="buf"] .pc-load{opacity:1}
+.pc-fb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f-hud);font-weight:700;font-size:22px;padding:10px 16px;border-radius:12px;background:rgba(0,0,0,.55);opacity:0;pointer-events:none}
+.pc-fb.on{animation:pcFb .7s ease-out}
+@keyframes pcFb{0%{opacity:1;transform:translate(-50%,-50%) scale(.9)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+.pc-bar{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 8px;background:linear-gradient(0deg,rgba(0,0,0,.78),transparent);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none}
+.pctl.show .pc-bar,.pctl[data-st="pause"] .pc-bar,.pctl[data-st="end"] .pc-bar{opacity:1;transform:none;pointer-events:auto}
+.pc-seek{position:relative;height:16px;display:flex;align-items:center}
+.pc-seek::before{content:"";position:absolute;left:0;right:0;height:4px;border-radius:4px;background:rgba(255,255,255,.22)}
+.pc-buf,.pc-done{position:absolute;left:0;height:4px;border-radius:4px;width:0}
+.pc-buf{background:rgba(255,255,255,.35)}
+.pc-done{background:var(--accent);box-shadow:0 0 10px rgba(var(--acc-rgb),.6)}
+.pc-seek input{position:relative;width:100%;height:16px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+.pc-seek input::-webkit-slider-runnable-track{height:4px;background:transparent}
+.pc-seek input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;margin-top:-5px;box-shadow:0 0 0 4px rgba(var(--acc-rgb),.5)}
+.pc-seek input::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff}
+.pc-row{display:flex;align-items:center;gap:4px;margin-top:2px}
+.pc-btn{width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:#fff;display:grid;place-items:center;flex:none}
+.pc-btn:hover{background:rgba(255,255,255,.12)}
+.pc-btn svg{width:22px;height:22px}
+.pc-spd{width:auto;min-width:54px;flex:none;margin-inline:2px;padding:0 10px;border-radius:999px;font-family:var(--f-hud);font-size:13px;font-weight:700}
+.pc-time{font-family:var(--f-hud);font-size:12.5px;opacity:.9;margin-left:4px;white-space:nowrap}
+.pc-sp{flex:1}
+@media (max-width:420px){.pc-btn{width:36px;height:36px}.pc-btn svg{width:20px;height:20px}.pc-time{font-size:11.5px}}
+/* mini player: just tap to pause/play */
+.pv.mini .pc-bar,.pv.mini .pc-fb{display:none}
+.pv.mini .pc-big{width:44px;height:44px;margin:-22px 0 0 -22px;box-shadow:none}
+.pv.mini .pc-big svg{width:18px;height:18px;margin-left:2px}
+/* pseudo full screen (iPhone) */
+body.pv-fs{overflow:hidden}
+body.pv-fs .pv{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;z-index:300!important;border-radius:0!important;background:#000;display:flex!important;align-items:center;justify-content:center;padding:var(--sat) 0 var(--sab)}
+body.pv-fs .pv .pv-frame{width:100%!important;height:auto!important;max-height:100%;aspect-ratio:16/9;border-radius:0}
+body.pv-fs .pv .pv-bar{display:none}
+.pv:fullscreen{background:#000;display:flex;align-items:center}
+.pv:fullscreen .pv-frame{width:100%;height:100%;aspect-ratio:auto;border-radius:0}
 </style>
 
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -662,7 +706,7 @@ h1,h2,h3,h4,.brand b,.tile b,.wtitle{font-family:var(--f-display)}
 
 <main class="wrap gut" id="app"></main>
 <div id="pv" class="pv" hidden>
-  <div class="player pv-frame" id="player"><div id="ytp"></div></div>
+  <div class="player pv-frame" id="player"><div id="ytp"></div><div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-fb" id="pcFb"></div><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div></div>
   <div class="pv-bar">
     <button class="pv-t" id="pvOpen" aria-label="افتح المقطع"><b id="pvTitle"></b><small id="pvSub"></small></button>
     <button class="pv-b" id="pvPlay" aria-label="تشغيل أو إيقاف"></button>
@@ -814,7 +858,7 @@ function openMenu(btn,id){
    <button data-fav="${id}">${v.fav?I.heartF:I.heart}${v.fav?'إزالة من المفضلة':'إضافة للمفضلة'}</button>
    <button data-watch="${id}">${I.eye}${v.watched?'تعليم كغير مشاهد':'تعليم كمشاهد'}</button>
    <button data-copy="${id}">${I.copy}نسخ الرابط</button>
-   <a href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a>
+   <a href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}الرابط الأصلي</a>
    ${ed?`<hr><button data-edit="${id}">${I.edit}تعديل</button><button data-mv="${id}">${I.move}نقل لقسم</button><button class="danger" data-del="${id}">${I.trash}حذف</button>`:''}`;
   $('#menuL').append(m);
   const r=btn.getBoundingClientRect(),mw=m.offsetWidth,mh=m.offsetHeight;
@@ -968,7 +1012,7 @@ function loadYTApi(){
   ytApi.catch(()=>{ytApi=null});return ytApi;
 }
 function stopPlayer(){clearInterval(ytTimer);clearInterval(cdT);if(yt&&cur){try{const t=yt.getCurrentTime?.();if(t)cur.pos=t}catch(e){}save()}try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;document.body.classList.remove('cine-on');cine=false;
-  PV.id=null;cur=null;const pv=$('#pv');pv.hidden=true;pv.className='pv';pv.style.cssText='';$('#player').innerHTML='<div id="ytp"></div>';document.body.classList.remove('pv-mini');if(!route.startsWith('w-'))rerender()}
+  PV.id=null;cur=null;const pv=$('#pv');pv.hidden=true;pv.className='pv';pv.style.cssText='';$('#player').innerHTML='<div id="ytp"></div>'+PCTL;document.body.classList.remove('pv-mini');if(!route.startsWith('w-'))rerender()}
 /* ---- persistent player: full on the watch page, mini when you leave it ---- */
 const PV={id:null,mode:null};
 const IC_PAUSE='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
@@ -1011,7 +1055,6 @@ function renderWatch(id){
       <button class="btn sm ${v.fav?'on':''}" id="wFav">${v.fav?I.heartF:I.heart}${v.fav?'بالمفضلة':'مفضلة'}</button>
       <button class="btn sm ${v.watched?'on':''}" id="wDone">${I.check}${v.watched?'شفته':'شفته؟'}</button>
       <button class="btn sm" id="wCopy">${I.copy}نسخ الرابط</button>
-      <a class="btn sm" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}يوتيوب</a>
       ${editable()?`<button class="btn sm" id="wEdit">${I.edit}تعديل</button>`:''}
      </div>
      <details class="wmore"><summary>${sv('gear',16)}السرعة، التكرار، العلامات والملاحظات${sv('left',14)}</summary>
@@ -1058,29 +1101,30 @@ function renderMarks(){
   el.innerHTML=v.marks.length?v.marks.map((m,i)=>`<div class="bm" role="button" tabindex="0" data-seek="${m.t}"><span class="t num">${fmtT(m.t)}</span><span class="l" ${editable()?`contenteditable="true" data-mi="${i}"`:''}>${esc(m.l)}</span>${editable()?`<button class="x" data-mdel="${i}" aria-label="حذف العلامة">${sv('x',14)}</button>`:''}</div>`).join(''):'<div class="muted">علّم اللحظات المهمة بالمقطع حتى ترجعلها بضغطة.</div>';
 }
 function step(d){const i=Q.ids.indexOf(cur.id)+d;if(i>=0&&i<Q.ids.length)go('w-'+Q.ids[i])}
-function ensureYtp(){const box=$('#player');if(!$('#ytp')){box.innerHTML='<div id="ytp"></div>';yt=null}return box}
+function ensureYtp(){const box=$('#player');if(!$('#ytp')){box.innerHTML='<div id="ytp"></div>'+PCTL;yt=null}else if(!$('#pctl'))box.insertAdjacentHTML('beforeend',PCTL);return box}
 function mountPlayer(v){
   const box=$('#player');PV.id=v.id;clearInterval(cdT);clearInterval(ytTimer);box.querySelectorAll('.nextup').forEach(e=>e.remove());
-  const fallbackMsg=()=>{try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>صفحة المعاينة هذي تمنع تشغيل يوتيوب داخلها. افتح الموقع من رابط GitHub Pages، أو شغّل المقطع على يوتيوب.</p><a class="btn pri" href="${ytUrl(v,v.pos>5?v.pos:v.start)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`};
+  const fallbackMsg=()=>{try{yt&&yt.destroy&&yt.destroy()}catch(e){}yt=null;box.innerHTML=`<div class="pmsg"><span class="playorb">${I.play}</span><b>المشغّل يشتغل على رابط موقعك المنشور</b><p>افتح الموقع من رابط GitHub Pages حتى تشتغل المقاطع.</p></div>`};
   if(!ONLINE){fallbackMsg();return}
   ensureYtp();
   const resume=(!v.watched&&v.pos>5&&(!v.dur||v.pos<v.dur-10))?Math.floor(v.pos):(v.start||0);
   if(yt&&yt.loadVideoById){try{yt.loadVideoById({videoId:v.vid,startSeconds:resume});yt.setPlaybackRate(S.settings.speed)}catch(e){}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));return}
   loadYTApi().then(()=>{
     if(cur!==v)return;ensureYtp();
-    yt=new YT.Player('ytp',{videoId:v.vid,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,rel:0,modestbranding:1,playsinline:1,start:resume,origin:location.origin},
+    yt=new YT.Player('ytp',{videoId:v.vid,host:'https://www.youtube-nocookie.com',playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,iv_load_policy:3,cc_load_policy:0,rel:0,modestbranding:1,playsinline:1,start:resume,origin:location.origin},
       events:{
-        onReady:e=>{const v=cur;try{e.target.setPlaybackRate(S.settings.speed)}catch(_){}const d=e.target.getDuration();if(v&&d){v.dur=Math.round(d);saveLocal()}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));e.target.playVideo()},
+        onReady:e=>{const v=cur;pcSpeedLbl();pcMuteLbl();pcFsLbl();try{e.target.setPlaybackRate(S.settings.speed)}catch(_){}const d=e.target.getDuration();if(v&&d){v.dur=Math.round(d);saveLocal()}if(resume>5&&resume!==v.start)toast('كمّلنا من '+fmtT(resume));e.target.playVideo()},
         onStateChange:e=>{
-          const v=cur;pvState(e.data);if(!v)return;
+          const v=cur;pvState(e.data);pcState(e.data);if(!v)return;
           if(e.data===1){clearInterval(ytTimer);ytTimer=setInterval(()=>{try{v.pos=yt.getCurrentTime();if(!v.dur)v.dur=Math.round(yt.getDuration());if(v.dur&&v.pos/v.dur>.93&&!v.watched){v.watched=true;save()}else saveLocal()}catch(_){}},4000)}
           else if(e.data===2){clearInterval(ytTimer);try{v.pos=yt.getCurrentTime()}catch(_){}save()}
           else if(e.data===0){clearInterval(ytTimer);v.watched=true;v.pos=0;save();
             if(loopOn){yt.seekTo(0);yt.playVideo();return}
+            pcEnded(v);
             const i=Q.ids.indexOf(v.id),nx=S.videos.find(x=>x.id===Q.ids[i+1]);
             if(S.settings.autonext&&nx){if(route.startsWith('w-'))countdown(nx);else{cur=nx;nx.plays++;nx.last=Date.now();save();mountPlayer(nx);pvShow('mini')}}}
         },
-        onError:e=>{const c=e.data,v=cur||{};try{yt.destroy()}catch(_){}yt=null;box.innerHTML=`<div class="pmsg"><b>${c===101||c===150?'صاحب المقطع منع تشغيله خارج يوتيوب':c===100?'المقطع محذوف أو خاص':'ما گدرنا نشغّل المقطع'}</b><p>تگدر تشوفه مباشرة على يوتيوب.</p><a class="btn pri" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}فتح على يوتيوب</a></div>`}
+        onError:e=>{const c=e.data,v=cur||{};try{yt.destroy()}catch(_){}yt=null;box.innerHTML=`<div class="pmsg"><b>${c===101||c===150?'صاحب المقطع منع تشغيله داخل المواقع':c===100?'المقطع محذوف أو خاص':'ما گدرنا نشغّل المقطع'}</b><p>تگدر تفتح رابطه الأصلي.</p><a class="btn pri" href="${ytUrl(v)}" target="_blank" rel="noopener">${I.ext}الرابط الأصلي</a></div>`}
       }});
   }).catch(()=>{if(cur!==v)return;try{yt&&yt.destroy()}catch(_){}yt=null;box.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${v.vid}?autoplay=1&rel=0&playsinline=1&start=${resume}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(v.title)}"></iframe>`});
 }
@@ -1275,6 +1319,63 @@ function cloudPush(now){
   cloud.t=setTimeout(()=>{cloud.rev=uid();cloud.ref.set({payload:JSON.stringify(shared()),rev:cloud.rev,updated:Date.now()}).catch(err=>setCloud('err',err.code==='permission-denied'?'قاعدة البيانات رفضت الحفظ. عدّل قواعد Firestore':'فشل الحفظ'))},now?0:1500);
 }
 
+
+/* ================= OUR OWN PLAYER CONTROLS (YouTube controls are switched off) ================= */
+const PCTL=`<div class="pctl" id="pctl" data-st="idle"><div class="pc-hit" id="pcHit"></div><div class="pc-fb" id="pcFb"></div><button class="pc-big" id="pcBig" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg></button><div class="pc-load" aria-hidden="true"><i></i></div><div class="pc-bar"><div class="pc-seek"><i class="pc-buf" id="pcBuf"></i><i class="pc-done" id="pcDone"></i><input type="range" id="pcSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="pc-row"><button class="pc-btn" id="pcPlay" aria-label="تشغيل أو إيقاف"></button><button class="pc-btn" id="pcBack" aria-label="رجوع 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><button class="pc-btn" id="pcFwd" aria-label="قدّام 10 ثواني"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" stroke="none" font-family="sans-serif">10</text></svg></button><span class="pc-time" id="pcTime">0:00 / 0:00</span><span class="pc-sp"></span><button class="pc-btn pc-spd" id="pcSpeed" aria-label="السرعة">1×</button><button class="pc-btn" id="pcMute" aria-label="الصوت"></button><button class="pc-btn" id="pcFs" aria-label="ملء الشاشة"></button></div></div></div>`;
+const IC_VOL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const IC_MUTE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="m17 9 5 6M22 9l-5 6"/></svg>';
+const IC_FS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+const IC_FSX='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+const PC={hideT:null,seeking:false,st:-1,lastTap:0};
+const pcEl=id=>document.getElementById(id);
+function pcShow(stay){const c=pcEl('pctl');if(!c)return;c.classList.add('show');clearTimeout(PC.hideT);if(!stay&&PC.st===1)PC.hideT=setTimeout(()=>c.classList.remove('show'),2600)}
+function pcState(st){PC.st=st;const c=pcEl('pctl');if(!c)return;c.dataset.st=st===1?'play':st===2?'pause':st===3?'buf':st===0?'end':'idle';
+  const pb=pcEl('pcPlay');if(pb)pb.innerHTML=st===1||st===3?IC_PAUSE:I.play;if(st===1)pcShow();else pcShow(true)}
+function pcEnded(v){const c=pcEl('pctl');if(c){c.dataset.st='end'}}
+function pcToggle(){try{if(!yt||!yt.getPlayerState)return;const st=yt.getPlayerState();if(st===1||st===3)yt.pauseVideo();else{if(st===0)yt.seekTo(0,true);yt.playVideo()}}catch(e){}}
+function pcSeekBy(d){try{const t=Math.max(0,Math.min((yt.getDuration()||0)-1,yt.getCurrentTime()+d));yt.seekTo(t,true);pcFlash(d>0?'+'+d:''+d)}catch(e){}}
+function pcFlash(t){const f=pcEl('pcFb');if(!f)return;f.textContent=t;f.classList.remove('on');void f.offsetWidth;f.classList.add('on')}
+function pcSpeedLbl(){const b=pcEl('pcSpeed');if(b)b.textContent=(S.settings.speed||1)+'×'}
+function pcMuteLbl(){const b=pcEl('pcMute');if(!b)return;let m=false;try{m=yt&&yt.isMuted&&yt.isMuted()}catch(e){}b.innerHTML=m?IC_MUTE:IC_VOL}
+function pcFsLbl(){const b=pcEl('pcFs');if(b)b.innerHTML=(document.fullscreenElement||document.body.classList.contains('pv-fs'))?IC_FSX:IC_FS}
+function pcFull(){
+  const pv=$('#pv');
+  if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}
+  if(document.body.classList.contains('pv-fs')){document.body.classList.remove('pv-fs');pvFollow(300);pcFsLbl();return}
+  const req=pv.requestFullscreen||pv.webkitRequestFullscreen;
+  if(req&&!/iPhone|iPod/.test(navigator.userAgent)){Promise.resolve(req.call(pv)).catch(()=>{document.body.classList.add('pv-fs');pcFsLbl()})}
+  else{document.body.classList.add('pv-fs');pcFsLbl()}
+}
+document.addEventListener('fullscreenchange',()=>{pcFsLbl();pvFollow(300)});
+setInterval(()=>{
+  if(!yt||!yt.getCurrentTime)return;const c=pcEl('pctl');if(!c)return;
+  let t=0,d=0,b=0;try{t=yt.getCurrentTime()||0;d=yt.getDuration()||0;b=yt.getVideoLoadedFraction?yt.getVideoLoadedFraction():0}catch(e){return}
+  const tm=pcEl('pcTime');if(tm)tm.textContent=fmtT(t)+' / '+fmtT(d);
+  if(!PC.seeking&&d){const p=t/d;pcEl('pcSeek').value=Math.round(p*1000);pcEl('pcDone').style.width=(p*100)+'%'}
+  const bf=pcEl('pcBuf');if(bf)bf.style.width=(b*100)+'%';
+},250);
+const pBox=$('#player');
+pBox.addEventListener('click',e=>{
+  const b=e.target.closest('button,#pcHit');if(!b)return;
+  if(b.closest('.pv.mini')&&b.id==='pcHit'){pcToggle();return}
+  switch(b.id){
+    case 'pcHit':{const now=Date.now(),r=b.getBoundingClientRect(),x=e.clientX-r.left;
+      if(now-PC.lastTap<300){PC.lastTap=0;pcSeekBy(x<r.width/2?-10:10);return}PC.lastTap=now;
+      const c=pcEl('pctl');const shown=c.classList.contains('show');
+      setTimeout(()=>{if(PC.lastTap!==now)return;if(matchMedia('(hover:none)').matches&&!shown){pcShow();return}pcToggle()},260);break}
+    case 'pcBig':case 'pcPlay':pcToggle();break;
+    case 'pcBack':pcSeekBy(-10);break;
+    case 'pcFwd':pcSeekBy(10);break;
+    case 'pcSpeed':{const L=[1,1.25,1.5,2,.75];const i=L.indexOf(+S.settings.speed||1);S.settings.speed=L[(i+1)%L.length];saveLocal();try{yt.setPlaybackRate(S.settings.speed)}catch(_){}pcSpeedLbl();document.querySelectorAll('#spd [data-sp]').forEach(x=>x.classList.toggle('on',+x.dataset.sp===S.settings.speed));pcShow();break}
+    case 'pcMute':try{yt.isMuted()?yt.unMute():yt.mute()}catch(_){}setTimeout(pcMuteLbl,60);pcShow();break;
+    case 'pcFs':pcFull();break;
+  }
+});
+pBox.addEventListener('mousemove',()=>pcShow());
+pBox.addEventListener('input',e=>{if(e.target.id!=='pcSeek')return;PC.seeking=true;pcShow(true);try{const d=yt.getDuration();pcEl('pcTime').textContent=fmtT(e.target.value/1000*d)+' / '+fmtT(d);pcEl('pcDone').style.width=(e.target.value/10)+'%'}catch(_){}});
+pBox.addEventListener('change',e=>{if(e.target.id!=='pcSeek')return;try{yt.seekTo(e.target.value/1000*yt.getDuration(),true)}catch(_){}PC.seeking=false;pcShow()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('pv-fs')){document.body.classList.remove('pv-fs');pcFsLbl();pvFollow(300)}});
+pcSpeedLbl();pcMuteLbl();pcFsLbl();pcState(-1);
 /* ================= router ================= */
 let route='home';
 function go(h){if(location.hash==='#'+h)onRoute();else location.hash=h}
