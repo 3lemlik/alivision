@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-18">
+<meta name="app-build" content="2026.11.05-19">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1302,6 +1302,19 @@ html.lite .dock{background:var(--bg)!important}
   #pv.full.mus .pc-cover .cvbg{animation-duration:60s!important}
   body.is-playing .hudl span:first-child i,body.is-playing .mixnow i{animation:none!important}
 }
+
+/* ===== v19: draggable seek bars ===== */
+.mseek .tr{direction:ltr;touch-action:none;cursor:pointer;transition:height .15s}
+.mseek .tr::before{content:"";position:absolute;left:-6px;right:-6px;top:-16px;bottom:-16px}
+.mseek .tr input{pointer-events:none;direction:ltr}
+.mseek .tr.drag{height:9px}
+.mseek .kw{position:absolute;inset:0;pointer-events:none;transform:translateX(0)}
+.mseek .kn{position:absolute;left:0;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(var(--acc-rgb),.45),0 2px 8px rgba(0,0,0,.5);transition:transform .15s}
+.mseek .tr.drag .kn{transform:scale(1.35)}
+.mseek .tr.drag i,.mseek .tr.drag .kw{transition:none!important}
+.pc-seek{touch-action:none}
+.pc-seek::after{content:"";position:absolute;left:0;right:0;top:-12px;bottom:-12px}
+.pc-seek input{pointer-events:none}
 </style>
 <div class="aurora" id="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1771,7 +1784,7 @@ function renderMusicPlayer(id){
     <div class="orb"><svg class="oring" viewBox="0 0 200 200" aria-hidden="true"><circle class="ot" cx="100" cy="100" r="97"/><circle class="op" id="muRing" cx="100" cy="100" r="97" pathLength="1000" stroke-dasharray="0 1000"/><circle class="otk" cx="100" cy="100" r="89"/></svg><i class="o1"></i><i class="o2"></i><div class="pslot" id="pslot"></div></div>
     <div class="mi2"><h1 id="muTitle">${esc(v.list&&MIX.title&&same?MIX.title:v.title)}</h1><p>${v.list?'ميكس يوتيوب · '+esc(v.title.replace(/^ميكس · /,'')):esc(Q.name||'الموسيقى')}</p></div>
     <div class="adn">إعلان يشتغل هسه. دوس «تخطي» بزاوية الإطار، والأغنية تبدي وحدها.</div>
-    <div class="mseek"><div class="tr"><i id="muDone" style="width:0"></i><input type="range" id="muSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="tm"><span id="muT1">0:00</span><span id="muT2">${v.dur?fmtT(v.dur):'0:00'}</span></div></div>
+    <div class="mseek"><div class="tr" id="muTr"><i id="muDone"></i><span class="kw" id="muKw"><b class="kn"></b></span><input type="range" id="muSeek" min="0" max="1000" value="0" step="1" aria-label="التقدم"></div><div class="tm"><span id="muT1">0:00</span><span id="muT2">${v.dur?fmtT(v.dur):'0:00'}</span></div></div>
     <div class="mctl">
      <button class="tg ${MU.shuf?'on':''}" id="muShuf" aria-label="عشوائي">${I.shuffle}</button>
      <button id="muPrev" aria-label="السابق" ${qi<=0&&!v.list?'disabled':''}>${I.next}</button>
@@ -1806,6 +1819,15 @@ function renderMusicPlayer(id){
   $('#muShuf').onclick=()=>{if(cur.list){MU.shuf=!MU.shuf;try{yt.setShuffle(MU.shuf)}catch(e){}$('#muShuf').classList.toggle('on',MU.shuf);toast(MU.shuf?'الميكس صار عشوائي':'الميكس بالترتيب');setTimeout(mixList,500);return}MU.shuf=!MU.shuf;const rest=musicList().map(x=>x.id).filter(x=>x!==cur.id);Q={ids:[cur.id,...(MU.shuf?rest.sort(()=>Math.random()-.5):rest)],name:MU.shuf?'الموسيقى · عشوائي':'الموسيقى'};renderMusicPlayer(cur.id);toast(MU.shuf?'تشغيل عشوائي':'بالترتيب')};
   const sk=$('#muSeek');sk.oninput=()=>{MU.seek=true;$('#muDone').style.transform='scaleX('+(sk.value/1000)+')';try{$('#muT1').textContent=fmtT(sk.value/1000*yt.getDuration())}catch(_){}};
   sk.onchange=()=>{try{yt.seekTo(sk.value/1000*yt.getDuration(),true)}catch(_){}MU.seek=false};
+  {const tr=$('#muTr');let on=false;
+   const at=(e,commit)=>{const r=tr.getBoundingClientRect();const f=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));MU.seek=true;
+     $('#muDone').style.transform='scaleX('+f.toFixed(4)+')';$('#muKw').style.transform='translateX('+(f*100).toFixed(3)+'%)';sk.value=Math.round(f*1000);
+     let d=0;try{d=yt.getDuration()||0}catch(_){}if(d)$('#muT1').textContent=fmtT(f*d);
+     if(commit){try{yt.seekTo(f*d,true);if(yt.getPlayerState()===0)yt.playVideo()}catch(_){}setTimeout(()=>{MU.seek=false},350)}};
+   tr.addEventListener('pointerdown',e=>{on=true;try{tr.setPointerCapture(e.pointerId)}catch(_){}tr.classList.add('drag');at(e);e.preventDefault()});
+   tr.addEventListener('pointermove',e=>{if(on)at(e)});
+   tr.addEventListener('pointerup',e=>{if(!on)return;on=false;tr.classList.remove('drag');at(e,true)});
+   tr.addEventListener('pointercancel',()=>{on=false;tr.classList.remove('drag');MU.seek=false});}
   const mv=$('#muVol');if(mv)mv.oninput=()=>{S.settings.vol=+mv.value;mv.style.setProperty('--p',mv.value+'%');$('#muVolT').textContent=mv.value;saveLocal();try{if(yt.isMuted())yt.unMute();yt.setVolume(curVol())}catch(e){}};
   $('#muMute').onclick=()=>{try{yt.isMuted()?yt.unMute():yt.mute();setTimeout(()=>{const m=yt.isMuted();$('#muMute').style.color=m?'var(--accent)':'';toast(m?'انكتم الصوت':'رجع الصوت')},60)}catch(e){}};
   $('#muModes').onclick=e=>{const b=e.target.closest('[data-mm]');if(!b)return;S.settings.mmode=b.dataset.mm;saveLocal();applyAudio();$('#muModes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));const m=MODES[b.dataset.mm];toast(m.l+' · '+m.d+(IOS&&m.vol?' (الصوت الواطي من أزرار الآيفون)':''))};
@@ -2312,7 +2334,7 @@ setInterval(()=>{
     if(vd&&vd.video_id&&vd.video_id!==MIX.id&&!AD.on){MIX.id=vd.video_id;MIX.title=vd.title||MIX.T[vd.video_id]||'';try{MIX.n=(yt.getPlaylist()||[]).length;MIX.ix=yt.getPlaylistIndex()}catch(e){}if(MIX.title)MIX.T[MIX.id]=MIX.title;else mixTitle(MIX.id,tt=>{MIX.title=tt;mixUI()});mixUI();mixImport()}}
   const pg=pcEl('pvProg');if(pg&&d)pg.style.transform='scaleX('+(t/d).toFixed(4)+')';
   const rg=pcEl('muRing');if(rg&&d)rg.setAttribute('stroke-dasharray',(t/d*1000).toFixed(1)+' 1000');
-  const md=pcEl('muDone');if(md&&d){if(!MU.seek){md.style.transform='scaleX('+(t/d).toFixed(4)+')';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
+  const md=pcEl('muDone');if(md&&d){if(!MU.seek){const kw=pcEl('muKw');if(kw)kw.style.transform='translateX('+(t/d*100).toFixed(3)+'%)';md.style.transform='scaleX('+(t/d).toFixed(4)+')';pcEl('muSeek').value=Math.round(t/d*1000);pcEl('muT1').textContent=fmtT(t)}pcEl('muT2').textContent=fmtT(d)}
 },250);
 const pBox=$('#player');
 pBox.addEventListener('click',e=>{
@@ -2335,6 +2357,11 @@ pBox.addEventListener('click',e=>{
   }
 });
 pBox.addEventListener('mousemove',()=>pcShow());
+{let on=false;const at=(e,commit)=>{const sb=pcEl('pcSeek');if(!sb)return;const r=sb.getBoundingClientRect();const f=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));sb.value=Math.round(f*1000);sb.dispatchEvent(new Event('input',{bubbles:true}));if(commit)sb.dispatchEvent(new Event('change',{bubbles:true}))};
+ pBox.addEventListener('pointerdown',e=>{const z=e.target.closest('.pc-seek');if(!z)return;on=true;try{z.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();at(e)});
+ pBox.addEventListener('pointermove',e=>{if(on)at(e)});
+ pBox.addEventListener('pointerup',e=>{if(!on)return;on=false;at(e,true)});
+ pBox.addEventListener('pointercancel',()=>{if(on){on=false;PC.seeking=false}});}
 pBox.addEventListener('input',e=>{if(e.target.id!=='pcSeek')return;PC.seeking=true;pcShow(true);try{const d=yt.getDuration();pcEl('pcTime').textContent=fmtT(e.target.value/1000*d)+' / '+fmtT(d);pcEl('pcDone').style.transform='scaleX('+(e.target.value/1000)+')'}catch(_){}});
 pBox.addEventListener('change',e=>{if(e.target.id!=='pcSeek')return;try{yt.seekTo(e.target.value/1000*yt.getDuration(),true)}catch(_){}PC.seeking=false;pcShow()});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('pv-fs')){document.body.classList.remove('pv-fs');pcFsLbl();pvFollow(300)}});
