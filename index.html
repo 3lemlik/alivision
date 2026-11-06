@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="app-build" content="2026.11.05-20">
+<meta name="app-build" content="2026.11.07-2">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1709,6 +1709,37 @@ function addVideo(p,sec,title='',note='',kind='video'){
   S.videos.push(v);save();rerender();toast(kind==='music'?'انضافت للموسيقى':kind==='both'?'انضاف للفيديو والموسيقى':'انضاف المقطع'+(secOf(sec)?' إلى '+secOf(sec).name:''));
   if(!title)fetchTitle(v);return v;
 }
+/*LINKIMP*/
+/* ================= import YouTube links from any file (Excel / CSV / text) ================= */
+async function linkImport(f){
+  let rows=[];
+  try{
+    if(/\.(xlsx|xls|ods)$/i.test(f.name)){await loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});wb.SheetNames.forEach(n=>rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:false,defval:''})))}
+    else{const t=await f.text();rows=t.split(/\r?\n/).map(l=>l.split(/[,;\t]/))}
+  }catch(e){toast('ما گدرت أقرا الملف');return}
+  const have=new Set(S.videos.map(v=>v.vid+'|'+(v.list||''))),seen=new Set(),out=[];
+  rows.forEach(r=>{const cells=(r||[]).map(c=>String(c??'').trim());
+    cells.forEach(c=>{const found=c.match(/https?:\/\/[^\s"'<>]+|(?:www\.)?youtu[^\s"'<>]+/gi)||[];found.forEach(u=>{const p=parseYT(u);if(!p||(!p.vid&&!p.list))return;const k=(p.vid||'')+'|'+(isMix(p.list)||!p.vid?p.list||'':'');if(seen.has(k))return;seen.add(k);
+      const title=cells.find(x=>x&&!/https?:|youtu/i.test(x)&&!/^\d+([.,]\d+)?$/.test(x)&&x.length>1)||'';out.push({p,title:title.slice(0,140),dup:have.has(k)})})})});
+  const nw=out.filter(x=>!x.dup);
+  if(!out.length){toast('ما لگيت روابط يوتيوب بالملف');return}
+  const secs=S.sections.filter(x=>!x.music);
+  openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>استيراد روابط</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
+   <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+    <p style="margin:0">لگيت <b>${out.length}</b> رابط بالملف${out.length-nw.length?`، منهم <b>${out.length-nw.length}</b> موجودين أصلاً وما راح ينضافون`:''}.</p>
+    <div class="field"><label>يظهر بـ</label><div class="seg" role="group" id="liK" style="display:flex;width:100%"><button type="button" data-k="video" aria-pressed="true" style="flex:1">فيديو</button><button type="button" data-k="music" aria-pressed="false" style="flex:1">موسيقى</button><button type="button" data-k="both" aria-pressed="false" style="flex:1">الاثنين</button></div></div>
+    <div class="field"><label>القسم</label><select class="in" id="liS"><option value="">بدون قسم</option>${secs.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></div>
+    <div style="max-height:34vh;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:13px">${out.slice(0,60).map(x=>`<div style="display:flex;gap:8px;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);${x.dup?'opacity:.45':''}"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.title||(x.p.vid?'مقطع '+x.p.vid:'ميكس'))}</span><span style="flex:none;color:var(--dim)">${x.dup?'موجود':'جديد'}</span></div>`).join('')}${out.length>60?`<div style="padding:6px 0;color:var(--dim)">… و${out.length-60} ثاني</div>`:''}</div>
+   </div>
+   <div class="pf"><button class="btn pri" id="liGo"${nw.length?'':' disabled'}>إضافة ${nw.length} مقطع</button><button class="btn" data-close>رجوع</button></div></div>`);
+  let K='video';$('#liK').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;K=b.dataset.k;$('#liK').querySelectorAll('[data-k]').forEach(x=>x.setAttribute('aria-pressed',x===b))};
+  $('#liGo').onclick=()=>{const sec=K==='music'?'':$('#liS').value;const now=Date.now();
+    const vs=nw.map((x,i)=>{const lst=isMix(x.p.list)||!x.p.vid?x.p.list:'';return {id:uid(),kind:K,list:lst||'',vid:x.p.vid,title:x.title||'دا يجيب العنوان…',section:sec,note:'',start:x.p.start||0,fav:false,watched:false,plays:0,added:now+i,last:0,pos:0,dur:0,marks:[]}});
+    S.videos.push(...vs);save();closeLayer(true);rerender();toast('انضاف '+vs.length+' مقطع من الملف');
+    vs.filter(v=>v.title==='دا يجيب العنوان…').forEach((v,i)=>setTimeout(()=>fetchTitle(v),i*350));
+  };
+}
+
 let RRT=null;function rrLater(){clearTimeout(RRT);RRT=setTimeout(()=>rerender(true),700)}
 function fetchTitle(v){
   const fallback=()=>{if(v.title==='دا يجيب العنوان…'){v.title=v.list?'ميكس يوتيوب':'مقطع '+v.vid;save();rrLater()}};
@@ -2133,7 +2164,7 @@ function openSettingsFull(){
      ${AUTH.admin?'<div class="rowb"><button class="btn sm" id="aPub">انشر مكتبتي الشخصية كمحتوى عام</button><button class="btn sm" id="aOut">طلعة المدير</button></div>':'<div class="rowb"><input class="in" id="aPw" type="password" placeholder="باسورد المدير" autocomplete="off"><button class="btn sm" id="aIn">دخول المدير</button></div>'}</div>
    </div>
    <div class="grp"><h5>نسخة احتياطية</h5>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="bExp">${sv('copy',15)}نسخ البيانات</button>${ONLINE?'<button class="btn sm" id="bDl">تنزيل ملف</button>':''}<label class="btn sm" style="cursor:pointer">استيراد ملف<input type="file" id="bImp" accept=".json,application/json" hidden></label></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="bExp">${sv('copy',15)}نسخ البيانات</button>${ONLINE?'<button class="btn sm" id="bDl">تنزيل ملف</button>':''}<label class="btn sm" style="cursor:pointer">استيراد ملف<input type="file" id="bImp" accept=".json,application/json" hidden></label>${editable()?`<label class="btn sm" style="cursor:pointer">${sv('plus',15)}استيراد روابط (Excel / CSV / نص)<input type="file" id="lImp" accept=".xlsx,.xls,.csv,.txt,.json,text/plain" hidden></label>`:''}</div>
     <textarea class="in ltr" id="bPaste" placeholder="أو الصق النسخة هنا" style="min-height:60px;font-size:12px"></textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="bRest">استعادة</button>${ed?'<button class="btn sm" id="bReset" style="color:var(--accent)">مسح كل شيء</button>':''}</div>
    </div>
@@ -2159,6 +2190,7 @@ function openSettingsFull(){
   const restore=txt=>{if(!editable()){toast('المحتوى العام يعدّله المدير بس');return}try{const d=JSON.parse(txt);if(!Array.isArray(d.videos)||!Array.isArray(d.sections))throw 0;applyShared(d);save();closeLayer(true);rerender();toast('رجعت البيانات')}catch(e){toast('البيانات تالفة أو مو من هذا الموقع')}};
   $('#bImp').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(restore)};
   $('#bRest').onclick=()=>restore($('#bPaste').value);
+   const li=$('#lImp');if(li)li.onchange=e=>{const f=e.target.files[0];if(f)linkImport(f)};
   const br=$('#bReset');if(br)br.onclick=()=>confirmBox('مسح كل المقاطع والأقسام؟ إذا المزامنة شغالة، ينمسح من كل الأجهزة.','مسح الكل',()=>{S.sections=[];S.videos=[];S.lastId=null;save();rerender();toast('تم المسح')});
 }
 
@@ -2184,16 +2216,42 @@ async function cloudInit(){
   try{await fbLoad()}catch(e){setCloud('err','ما گدرت أتصل بقاعدة البيانات، تأكد من الإنترنت');return}
   const mk=n=>firebase.apps.find(a=>a.name===n)||firebase.initializeApp(FB_CFG,n);
   AUTH.A=mk('av-admin');AUTH.U=mk('av-user');
-  cloud.pubRef=AUTH.A.firestore().collection('alivision').doc('public');
-  cloud.pubRef.onSnapshot(snap=>{
-    if(!snap.exists){setCloud('on','متصل · المحتوى العام فارغ لحد الآن');return}
+  if(!TEN.id){const q=urlSlug();if(q){try{const d=await AUTH.A.firestore().collection('slugs').doc(q).get();if(d.exists&&d.data().p==='av'){TEN.id=d.data().acct;TEN.biz=d.data().biz||''}}catch(e){}}}
+  pubSub();
+  AUTH.A.auth().onAuthStateChanged(async u=>{
+    const isMain=!!u&&(u.email||'').toLowerCase()===ADMIN_EMAIL;
+    if(u&&!isMain){const r=await tenOf(u);if(r.ok){if(TEN.id!==r.acct){TEN.id=r.acct;TEN.biz=r.biz;pubSub()}TEN.own=true;TEN.state=r.st}else{TEN.own=false;if(r.st)TEN.state=r.st;else{try{await AUTH.A.auth().signOut()}catch(e){}}}}
+    else TEN.own=false;
+    AUTH.admin=isMain&&!TEN.id||(!!TEN.own&&TEN.state==='ok');syncFab();rerender(true);refreshSettings()});
+  AUTH.U.auth().onAuthStateChanged(u=>{AUTH.user=u||null;mineSub();refreshSettings()});
+}
+/* ===== حسابات العملاء (منصة AM NET): كل عميل عنده مكتبة عامة خاصة بيه تحت av/{الحساب} ===== */
+const TEN={id:'',biz:'',own:false,state:''};
+const urlSlug=()=>{let q='';try{q=(new URLSearchParams(location.search).get('s')||'').trim().toLowerCase()}catch(e){}try{if(q)localStorage.setItem('av_last_slug',q);else if(!/^#admin/i.test(location.hash)&&((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone))q=localStorage.getItem('av_last_slug')||''}catch(e){}return q};
+/* client sites: keep ?s=… in the address so "Add to Home Screen" on iPhone opens the right library */
+(function(){const q=urlSlug();if(!q)return;try{if(!/[?&]s=/.test(location.search))history.replaceState(null,'',location.pathname+'?s='+q+location.hash)}catch(e){}
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)){const l=document.querySelector('link[rel="manifest"]');if(l)l.remove()}})();
+async function amEmail(pw){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('amnet:'+pw));return 'u'+[...new Uint8Array(b)].slice(0,16).map(x=>x.toString(16).padStart(2,'0')).join('')+'@amnet.app'}
+const tsN=v=>v&&v.toMillis?v.toMillis():v&&v.seconds?v.seconds*1000:+v||0;
+async function tenOf(u){
+  const db=AUTH.A.firestore();
+  try{const l=await db.collection('logins').doc(u.uid).get();if(!l.exists||!l.data().acct)return {ok:false};
+    const acct=l.data().acct,a=await db.collection('accounts').doc(acct).get(),A=a.exists?a.data():null;
+    if(!A||(A.product||'isp')!=='av')return {ok:false};
+    const st=A.active===false?'off':tsN(A.expiresAt)<=Date.now()?'expired':'ok';
+    return {ok:st==='ok',st,acct,biz:A.biz||A.name||''};
+  }catch(e){return {ok:false}}
+}
+function pubSub(){
+  try{cloud.pubUnsub&&cloud.pubUnsub()}catch(e){}
+  cloud.pubRef=TEN.id?AUTH.A.firestore().collection('av').doc(TEN.id).collection('d').doc('public'):AUTH.A.firestore().collection('alivision').doc('public');
+  cloud.pubUnsub=cloud.pubRef.onSnapshot(snap=>{
+    if(!snap.exists){if(TEN.id){applyPub({sections:[],videos:[]});saveLocal();if(S.src==='pub')rerender(true)}setCloud('on','متصل · المحتوى العام فارغ لحد الآن');return}
     const d=snap.data();
     if(d.rev&&d.rev===cloud.pubRev){setCloud('on','متصل · انحفظ للكل');return}
     try{applyPub(JSON.parse(d.payload));saveLocal();if(S.src==='pub')rerender(true)}catch(e){}
     setCloud('on','متصل · المحتوى العام يوصل لكل الأجهزة');
-  },err=>setCloud('err',err.code==='permission-denied'?'قاعدة البيانات رفضت الوصول، لازم تنشر قواعد Firestore الجديدة':'انقطع الاتصال بقاعدة البيانات'));
-  AUTH.A.auth().onAuthStateChanged(u=>{AUTH.admin=!!u&&(u.email||'').toLowerCase()===ADMIN_EMAIL;syncFab();rerender(true);refreshSettings()});
-  AUTH.U.auth().onAuthStateChanged(u=>{AUTH.user=u||null;mineSub();refreshSettings()});
+  },err=>setCloud('err',err.code==='permission-denied'?(TEN.id?'هذا الموقع موقوف حالياً، تواصل ويه الإدارة':'قاعدة البيانات رفضت الوصول، لازم تنشر قواعد Firestore الجديدة'):'انقطع الاتصال بقاعدة البيانات'));
 }
 function mineSub(){
   try{cloud.mineUnsub&&cloud.mineUnsub()}catch(e){}cloud.mineUnsub=null;cloud.mineRef=null;
@@ -2225,7 +2283,14 @@ async function userLogin(code){
 }
 async function adminLogin(pw){
   if(!pw)return;if(!AUTH.A){toast('قاعدة البيانات مو متصلة');return}
-  try{await AUTH.A.auth().signInWithEmailAndPassword(ADMIN_EMAIL,pw);toast('هلا علي، تگدر تعدّل المحتوى العام')}catch(e){toast(e&&e.code==='auth/network-request-failed'?'ماكو إنترنت':'الباسورد غلط')}
+  const a=AUTH.A.auth();
+  if(!TEN.id){try{await a.signInWithEmailAndPassword(ADMIN_EMAIL,pw);toast('هلا علي، تگدر تعدّل المحتوى العام');return}catch(e){if(e&&e.code==='auth/network-request-failed'){toast('ماكو إنترنت');return}}}
+  /* حساب عميل من لوحة AM NET */
+  try{const c=await a.signInWithEmailAndPassword(await amEmail(pw),pw);const r=await tenOf(c.user);
+    if(!r.acct){await a.signOut();toast('كلمة السر هذي مو لحساب علي فيجن');return}
+    if(!r.ok){toast(r.st==='off'?'حسابك موقوف حالياً، راسل الإدارة':'انتهى اشتراكك، راسل الإدارة حتى يتجدد');return}
+    toast('هلا بيك، تگدر تعدّل محتوى '+(r.biz||'موقعك'))}
+  catch(e){toast(e&&e.code==='auth/network-request-failed'?'ماكو إنترنت':'الباسورد غلط')}
 }
 /* ---- personal library sheet ---- */
 const lsG=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
@@ -2240,12 +2305,13 @@ function openPersonal(){
 document.addEventListener('click',e=>{if(e.target.closest('#synch'))openPersonal()});
 function openAdmin(){
   openLayer(`<div class="panel" role="dialog" aria-modal="true"><div class="ph"><h4>دخول المدير</h4><button class="xb" data-close aria-label="سدّها">${I.x}</button></div>
-   <div class="pb">${AUTH.admin?'<p style="margin:0">إنت داخل كمدير.</p>':'<input class="in" id="admPw" type="password" placeholder="باسورد المدير" autocomplete="off" autofocus>'}</div>
+   <div class="pb">${AUTH.admin?'<p style="margin:0">إنت داخل كمدير.</p>':'<input class="in" id="admPw" type="password" placeholder="كلمة السر" autocomplete="off" autofocus>'}</div>
    <div class="pf">${AUTH.admin?'<button class="btn pri" id="admSet">الإعدادات الكاملة</button><button class="btn" id="admOut">طلعة المدير</button>':'<button class="btn pri" id="admIn">دخول</button><button class="btn" data-close>رجوع</button>'}</div></div>`);
   const ai=$('#admIn');if(ai){ai.onclick=async()=>{await adminLogin($('#admPw').value);setTimeout(()=>{if(AUTH.admin){closeLayer(true);openSettings()}},350)};$('#admPw').onkeydown=e=>{if(e.key==='Enter')ai.click()}}
   const as=$('#admSet');if(as)as.onclick=()=>{closeLayer(true);openSettings()};
   const ao=$('#admOut');if(ao)ao.onclick=()=>AUTH.A.auth().signOut().then(()=>{closeLayer(true);toast('طلعت من المدير')});
 }
+const admHash=()=>{if(/^#admin$/i.test(location.hash)){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}openAdmin()}};setTimeout(admHash,1400);addEventListener('hashchange',admHash);
 (()=>{let n=0,t=0;document.addEventListener('click',e=>{if(!e.target.closest('.brand .logo'))return;const now=Date.now();n=now-t<700?n+1:1;t=now;if(n>=5){n=0;openAdmin()}})})();
 /* ---- switch between public / personal ---- */
 function syncFab(){const f=$('#dAdd');if(!f)return;const ed=editable();f.classList.toggle('srch',!ed);f.innerHTML=ed?I.plus:I.search;f.setAttribute('aria-label',ed?'إضافة رابط':'بحث');const b=$('#bAdd');if(b)b.style.display=ed?'':'none';document.body.classList.toggle('ro',!ed);document.body.classList.toggle('adm',!!AUTH.admin)}
@@ -2560,5 +2626,35 @@ window.__av={playing:()=>{try{return!!yt&&yt.getPlayerState()===1}catch(e){retur
   setTimeout(check,4000);
 })();
 </script>
+<!-- ===== shared: zoom lock + "add to home screen" invite (Ali Malik sites) ===== -->
+<style>html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+#a2hs{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:2147483000;max-width:460px;margin:0 auto;display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:18px;background:rgba(20,20,26,.96);color:#f2f3f6;border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px -14px rgba(0,0,0,.75);font:500 14px/1.5 "IBM Plex Sans Arabic",system-ui,sans-serif;direction:rtl;animation:a2in .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes a2in{from{opacity:0;transform:translateY(20px)}}
+#a2hs img{width:48px;height:48px;border-radius:12px;flex:none;object-fit:cover;background:#222}
+#a2hs b{display:block;font-size:15px}#a2hs small{display:block;color:#b9bdc7;font-size:12.5px}
+#a2hs .a2b{flex:none;border:0;border-radius:11px;padding:9px 14px;font:700 14px inherit;background:#ec1c32;color:#fff;cursor:pointer}
+#a2hs .a2x{position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:#2a2a33;color:#fff;font-size:15px;line-height:1;cursor:pointer}
+#a2hs .shr{display:inline-block;width:16px;height:16px;vertical-align:-3px}</style>
+<script>(function(){
+  /* zoom lock (iOS ignores user-scalable=no) */
+  try{document.addEventListener("gesturestart",function(e){e.preventDefault()},{passive:false});document.addEventListener("gesturechange",function(e){e.preventDefault()},{passive:false});
+    document.addEventListener("touchmove",function(e){if(e.scale!==undefined&&e.scale!==1)e.preventDefault()},{passive:false})}catch(e){}
+  var standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+  if(standalone||!/^https:/.test(location.protocol))return;
+  var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1),mobile=ios||/android/i.test(ua);
+  if(!mobile)return;
+  var KEY="a2hs_skip_"+location.pathname;try{var t=+localStorage.getItem(KEY)||0;if(Date.now()-t<3*864e5)return}catch(e){}
+  var deferred=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;show()});
+  var shown=false;
+  function show(){if(shown)return;shown=true;var ic=(document.querySelector('link[rel="apple-touch-icon"]')||{}).href||"",name=document.title||"الموقع";
+    var d=document.createElement("div");d.id="a2hs";d.setAttribute("role","dialog");
+    var share='<svg class="shr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+    d.innerHTML=(ic?'<img alt="" onerror="this.remove()" src="'+ic+'">':"")+'<div style="flex:1;min-width:0"><b>ثبّت '+name.replace(/[<>&]/g,"")+' على شاشتك</b><small>'+(deferred?"يفتح مثل تطبيق، أسرع وبدون متصفح":ios?"دوس "+share+" بالأسفل ← «إضافة إلى الشاشة الرئيسية»":"من قائمة المتصفح ⋮ ← «إضافة إلى الشاشة الرئيسية»")+'</small></div>'+(deferred?'<button class="a2b" type="button">تثبيت</button>':"")+'<button class="a2x" type="button" aria-label="إغلاق">×</button>';
+    document.body.appendChild(d);
+    d.querySelector(".a2x").onclick=function(){try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}d.remove()};
+    var b=d.querySelector(".a2b");if(b)b.onclick=function(){deferred.prompt();deferred.userChoice.then(function(){d.remove()})}}
+  setTimeout(function(){if(!shown&&(ios||!deferred))show()},ios?2500:6000);
+})();</script>
+
 </body>
 </html>
